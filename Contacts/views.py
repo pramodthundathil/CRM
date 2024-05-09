@@ -10,10 +10,12 @@ from django.contrib.auth.models import User
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from datetime import date, datetime
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
 # all contact tab can view with pagenator no filter for contact 
+@login_required(login_url="login")
 def AddContact(request):
 
     contacts = StudentContact.objects.filter(active = True)
@@ -50,6 +52,7 @@ def AddContact(request):
 
 # Exporting data from an excelsheet on all contact tab
 
+@login_required(login_url="login")
 def import_data_from_excel(request):
     if request.method == 'POST' and request.FILES['excel_file']:
         excel_file = request.FILES['excel_file']
@@ -115,6 +118,7 @@ def import_data_from_excel(request):
 
 
 # pending tasks are filterd by follow_up status 
+@login_required(login_url="login")
 def PendingContacts(request):
     contacts = StudentContact.objects.filter(follow_up_status = "Not Called",active = True)
     p = Paginator(contacts, 30)
@@ -138,6 +142,7 @@ def PendingContacts(request):
 
 # single view contact triggering on verious funtions
 
+@login_required(login_url="login")
 def ViewContactData(request,pk):
     contact = StudentContact.objects.get(id = pk)
     leadcall_status = LeadCallStatus.objects.filter(contact = contact)[::-1]
@@ -150,6 +155,7 @@ def ViewContactData(request,pk):
 
 #update basic data of contact 
 
+@login_required(login_url="login")
 def UpdateBasicData(request,pk):
     contact = StudentContact.objects.get(id = pk)
     if request.method == "POST":
@@ -164,6 +170,7 @@ def UpdateBasicData(request,pk):
 
 # updating leads status 
 
+@login_required(login_url="login")
 def FollowUpDateUpdate(request,pk):
     contact = StudentContact.objects.get(id = pk)
     if request.method == "POST":
@@ -173,6 +180,7 @@ def FollowUpDateUpdate(request,pk):
         return redirect("ViewContactData",pk = pk)
     return redirect("ViewContactData",pk = pk)
 
+@login_required(login_url="login")
 def lead_statusUpdate(request,pk,strval):
     contact = StudentContact.objects.get(id = pk)
     contact.lead_status = strval
@@ -181,6 +189,7 @@ def lead_statusUpdate(request,pk,strval):
     return redirect("ViewContactData",pk = pk)
 
 
+@login_required(login_url="login")
 def FollowUpUpadte(request,pk):
     contact = StudentContact.objects.get(id = pk)
     if request.method == "POST":
@@ -212,6 +221,7 @@ def FollowUpUpadte(request,pk):
 
 # assigning the contact to specific staff
 
+@login_required(login_url="login")
 def AssignContacts(request):
     contacts = StudentContact.objects.filter(lead_follow_up = None,active = True)
     contacts_count = StudentContact.objects.filter(lead_follow_up = None,active = True).count()
@@ -251,6 +261,7 @@ def AssignContacts(request):
     return render(request,'assigntostaff.html',context)
 
 
+@login_required(login_url="login")
 def TodaysNewCalls(request):
     contacts= StudentContact.objects.filter(lead_follow_up = request.user,follow_up_status = "Not Called", next_follow_up = date.today(),active = True )
     p = Paginator(contacts, 30)
@@ -271,6 +282,7 @@ def TodaysNewCalls(request):
     }  
     return render(request,"todaysnewcall.html",context)
 
+@login_required(login_url="login")
 def MyAssignments(request):
     contacts = StudentContact.objects.filter(lead_follow_up = request.user,follow_up_status = "Not Called",active = True ).order_by("next_follow_up")
     contacts_count = StudentContact.objects.filter(lead_follow_up = request.user,follow_up_status = "Not Called",active = True).count()
@@ -294,6 +306,7 @@ def MyAssignments(request):
     return render(request,"myassignments.html",context)
 
 
+@login_required(login_url="login")
 def PendingTocall(request):
     contacts = StudentContact.objects.filter(lead_follow_up = request.user,next_follow_up__lt = date.today(),active = True)
     p = Paginator(contacts, 30)
@@ -315,6 +328,7 @@ def PendingTocall(request):
     return render(request,"pendingcontacts.html",context)
 
 
+@login_required(login_url="login")
 def TodaysFollowUp(request):
     contacts = StudentContact.objects.filter(lead_follow_up = request.user,next_follow_up = date.today(),active = True).exclude(follow_up_status = "Not Called")
     p = Paginator(contacts, 30)
@@ -336,6 +350,7 @@ def TodaysFollowUp(request):
 
     return render(request,"todays_follow_up.html",context)
 
+@login_required(login_url="login")
 def UpcommingFollowUp(request):
     contacts = StudentContact.objects.filter(lead_follow_up = request.user,next_follow_up__gt = date.today(),active = True)
     p = Paginator(contacts, 30)
@@ -358,6 +373,7 @@ def UpcommingFollowUp(request):
     return render(request,"upcommingfollowup.html",context)
 
 
+@login_required(login_url="login")
 def WarmLeadsUser(request):
     contacts = StudentContact.objects.filter(lead_follow_up = request.user,lead_status ='Warm Lead',active = True)
     p = Paginator(contacts, 30)
@@ -378,6 +394,7 @@ def WarmLeadsUser(request):
     }  
     return render(request,"warmleadsuser.html",context)
 
+@login_required(login_url="login")
 def HotLeadsUser(request):
     contacts = StudentContact.objects.filter(lead_follow_up = request.user,lead_status ='Hot Lead',active = True )
     p = Paginator(contacts, 30)
@@ -398,6 +415,7 @@ def HotLeadsUser(request):
     }  
     return render(request,"hotleadsuser.html",context)
 
+@login_required(login_url="login")
 def ConvertedLeads(request):
     contacts = StudentContact.objects.filter(lead_follow_up = request.user,lead_status ='Converted',active = True)
     p = Paginator(contacts, 30)
@@ -418,6 +436,7 @@ def ConvertedLeads(request):
     }  
     return render(request,'convertedleads.html',context)
 
+@login_required(login_url="login")
 def CompletedToday(request):
     contacts = StudentContact.objects.filter(lead_follow_up = request.user,last_follow_up = date.today(),active = True)
     p = Paginator(contacts, 30)
@@ -437,6 +456,7 @@ def CompletedToday(request):
 
     return render(request,"leadscompletedtoday.html",context)
 from django.db.models import Q
+@login_required(login_url="login")
 def Search(request):
     contacts = None
     if request.method == "POST":
@@ -455,6 +475,7 @@ def Search(request):
 
 
 
+@login_required(login_url="login")
 def UserWiseData(request):
     users = User.objects.all()
     context = {
@@ -462,6 +483,7 @@ def UserWiseData(request):
     }
     return render(request,"userwisedata.html",context)
 
+@login_required(login_url="login")
 def UpdatesOfstaff(request,pk):
     user = User.objects.get(id = pk)
     contact_count = StudentContact.objects.filter(lead_follow_up = user,follow_up_status = "Not Called",active = True ).count()
@@ -484,6 +506,7 @@ def UpdatesOfstaff(request,pk):
     return render(request,"updatesofstaffs.html",context)
 
 
+@login_required(login_url="login")
 def TodaysNewCallsAdmin(request,pk):
     user1 = User.objects.get(id = pk)
     contacts= StudentContact.objects.filter(lead_follow_up = user1,follow_up_status = "Not Called", next_follow_up = date.today(),active = True )
@@ -505,6 +528,7 @@ def TodaysNewCallsAdmin(request,pk):
     return render(request,"todaysnewcall.html",context)
 
 
+@login_required(login_url="login")
 def PendingTocallAdmin(request,pk):
     user1 = User.objects.get(id = pk)
 
@@ -528,6 +552,7 @@ def PendingTocallAdmin(request,pk):
 
     return render(request,"pendingcontacts.html",context)
 
+@login_required(login_url="login")
 def TodaysFollowUpAdmin(request,pk):
     user1 = User.objects.get(id = pk)
 
@@ -552,6 +577,7 @@ def TodaysFollowUpAdmin(request,pk):
     return render(request,"todays_follow_up.html",context)
 
 
+@login_required(login_url="login")
 def MyAssignmentsAdmin(request,pk):
     user1 = User.objects.get(id = pk)
 
@@ -577,6 +603,7 @@ def MyAssignmentsAdmin(request,pk):
     }  
     return render(request,"myassignments.html",context)
 
+@login_required(login_url="login")
 def UpcommingFollowUpAdmin(request,pk):
     user1 = User.objects.get(id = pk)
     contacts = StudentContact.objects.filter(lead_follow_up = user1,next_follow_up__gt = date.today(),active = True)
@@ -598,6 +625,7 @@ def UpcommingFollowUpAdmin(request,pk):
 
     return render(request,"upcommingfollowup.html",context)
 
+@login_required(login_url="login")
 def CompletedTodayAdmin(request,pk):
     user1 = User.objects.get(id = pk)
     contacts = StudentContact.objects.filter(lead_follow_up = user1,last_follow_up = date.today(),active = True)

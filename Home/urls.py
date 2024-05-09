@@ -10,7 +10,7 @@ urlpatterns = [
     path("Index",views.Index,name="Index"),
     path("CompanyProfile",views.CompanyProfiles,name="CompanyProfile"),
     path('', CustomLoginView.as_view(), name='login'),
-    path('logout/', LogoutView.as_view(), name='logout'),
+    path('logout', views.SignOut, name='logout'),
     path("SataffUserCreations",views.SataffUserCreations,name="SataffUserCreations"),
     path("Mytasks",views.Mytasks,name="Mytasks"),
     

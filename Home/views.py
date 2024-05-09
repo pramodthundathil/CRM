@@ -9,6 +9,7 @@ from django.contrib.auth.views import LoginView
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
 from datetime import date, datetime
+from django.contrib.auth.decorators import login_required
 
 # models import 
 
@@ -75,7 +76,7 @@ def SignUp(request):
 
 def SignOut(request):
     logout(request)
-    return redirect('SignIn')
+    return render(request,'login.html')
 
 
 # index pages and utilities area 
@@ -92,7 +93,7 @@ class CustomLoginView(LoginView):
 # authentication and log out end ....................................
 
 
-
+@login_required(login_url="login")
 def Index(request):
     if request.user.groups.all()[0].name == "admin":
         contacts_count = StudentContact.objects.filter(active = True).count()
@@ -123,7 +124,7 @@ def Index(request):
 
 
 # company profile creation 
-
+@login_required(login_url="login")
 def CompanyProfiles(request):
     # getting company profile data.....................
     profile = CompanyProfile.objects.filter(user = request.user).first()
@@ -162,6 +163,7 @@ def CompanyProfiles(request):
     return render(request,"company_profile.html",context)
 
 
+@login_required(login_url="login")
 def SataffUserCreations(request):
     companyprofile = CompanyProfile.objects.get(user = request.user)
     staff =  companyprofile.user.all()
@@ -200,6 +202,7 @@ def SataffUserCreations(request):
     }
     return render(request,'Staff/addstaff.html',context)
 
+@login_required(login_url="login")
 def Mytasks(request):
     contact_count = StudentContact.objects.filter(lead_follow_up = request.user,follow_up_status = "Not Called",active = True ).count()
     new_contact_count = StudentContact.objects.filter(lead_follow_up = request.user,follow_up_status = "Not Called", next_follow_up = date.today(),active = True ).count()
