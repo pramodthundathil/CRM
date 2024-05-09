@@ -1,0 +1,154 @@
+{% extends 'index.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+  .company-profile{
+    padding: 20px;
+
+  }
+  .company-profile .items {
+
+  }
+</style>
+
+
+<div class="">
+    <div class="row">
+      
+      <div class="col-12 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Company Profile</h4>
+            <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Update Comapany Profile &nbsp;&nbsp;&nbsp; <i class="bi bi-pencil-square"></i></button>
+            <p class="card-description mt-3">
+              Comapany Profile
+            </p>
+
+            <!-- Modal -->
+            <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+              <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Update Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <form class="forms-sample" method="post" enctype="multipart/form-data">
+                      {% csrf_token %}
+                      <div class="form-group">
+                        <label for="exampleInputName1">Company Name</label>
+                        <input type="text" value="{{profile.Company_Name}}" name="cname" class="form-control" id="exampleInputName1" placeholder="Name">
+                      </div>
+                      <div class="form-group">
+                        <label for="exampleInputEmail3">Email address</label>
+                        <input type="email" name="email" value="{{profile.email}}" class="form-control" id="exampleInputEmail3" placeholder="Email">
+                      </div>
+                      <div class="form-group">
+                        <label for="exampleInputCity1">City</label>
+                        <input type="text" name="city" value="{{profile.City}}" class="form-control" id="exampleInputCity1" placeholder="Location">
+                      </div>
+                      <div class="form-group">
+                        <label for="exampleTextarea1">Company Description</label>
+                        <input class="form-control" value="{{profile.Company_Profile_Description}}" name="dis" id="exampleTextarea1">
+                      </div>
+                      
+                      <div class="form-group">
+                        <label>Company Logo</label>
+                        <div class="mb-3">
+                          {% if profile.Company_Logo %}
+                          <input class="form-control form-control-sm" value="{{profile.Company_Logo.url}}" name="logo" id="formFileSm" type="file">
+                          {% else %}
+                          <input class="form-control form-control-sm"  name="logo" id="formFileSm" type="file">
+                          {% endif %}
+
+                        </div>
+                        
+                      </div>
+                    
+                      <button type="submit" class="btn btn-primary me-2">Submit</button>
+                      <button class="btn btn-light">Cancel</button>
+                    </form>
+                  </div>
+                  <!-- <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  </div> -->
+                </div>
+              </div>
+            </div>
+             
+            <!-- modal end ------------------------------------------------------------- -->
+            
+
+
+
+
+            <div class="container company-profile">
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="items">
+
+                    {% if profile.Company_Logo %}
+                    <img src="{{profile.Company_Logo.url}}" style="width:80% !important" alt="">
+
+                    {% else %}
+                    <img src="{%static 'images/logosample.png' %}" style="width:80% !important" alt="">
+
+                    {% endif %}
+
+                  </div>
+                </div>
+                <div class="col-md-8">
+                  <div class="items">
+                    <div class="table-responsive">
+                      <table class="table">
+                        
+                        <tbody>
+                          <tr>
+                            <th>Company Name</th>
+                            <td>{{profile.Company_Name}}</td>
+                            
+                          </tr>
+                          <tr>
+                            <th>City</th>
+                            <td>{{profile.City}}</td>
+                            
+                          </tr>
+                          <tr>
+                            <th>Email</th>
+                            <td>{{profile.email}}</td>
+                            
+                          </tr>
+                          <tr>
+                            <th>Description</th>
+                            <td>{{profile.Company_Profile_Description}}</td>
+                           
+                          </tr>
+                          
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    
+     
+    </div>
+  </div>
+
+  <script>
+   {% for message in messages %}
+
+      alert("{{message}}.............")
+
+    {% endfor %}
+  </script>
+
+
+
+{% endblock %}

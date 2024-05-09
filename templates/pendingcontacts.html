@@ -1,0 +1,271 @@
+{% extends 'index.html' %}
+{% load static %}
+{% block content %}
+<style>
+  textarea {
+    width: 100%;
+    padding: 5px;
+    border: .5px solid gray;
+    border-radius: 5px;
+    outline: none;
+  }
+
+  .message {
+    padding: 10px;
+    opacity: .5;
+    animation: anim 2s infinite;
+
+  }
+
+  @keyframes anim {
+    0% {
+      opacity: .5;
+    }
+
+    /* 20%{
+      opacity:  .7;
+    }
+    40%{
+      opacity:  .5;
+    }
+    60%{
+      opacity: .3;
+    }
+    80%{
+      opacity:  .1;
+    } */
+    100% {
+      opacity: 1;
+    }
+  }
+
+  .pagenator {
+    text-align: center;
+  }
+</style>
+
+
+
+<div class="">
+  <div class="row flex-grow">
+    <div class="col-12 grid-margin stretch-card">
+      <div class="card card-rounded">
+        <div class="card-body">
+          <div class="d-sm-flex justify-content-between align-items-start">
+            <div>
+              <h4 class="card-title card-title-dash">Pending To Call   <span class="text-small">({{contacts_count}} Contacts)</span> </h4>
+              {% for message in messages %}
+              <div class="message {{message.tags}}">
+                <p class="card-subtitle card-subtitle-dash {{message.tags}}">{{message}}</p>
+                <p class="card-subtitle card-subtitle-dash text-danger">{{form.errors}}</p>
+              </div>
+              {% endfor %}
+            </div>
+            <div>
+              <!-- <button class="btn btn-primary text-white mb-0 me-0" type="button" data-bs-toggle="modal"
+                data-bs-target="#basicModal"><i class="mdi mdi-account-plus"></i> Add Contact</button>
+              <button class="btn btn-info text-white mb-0 me-0" type="button" data-bs-toggle="modal"
+                data-bs-target="#modalCenter"><i class="mdi mdi mdi-file-excel"></i>
+                Import</button>
+              <button class="btn btn-warning text-white mb-0 me-0" type="button"><i class="mdi mdi mdi-file-excel"></i>
+                Export</button> -->
+            </div>
+          </div>
+          <div class="table-responsive  mt-1">
+            <div class="container pagenator" style="display: flex;justify-content: center;">
+
+
+              <div class="demo-inline-spacing">
+                <!-- Basic Pagination -->
+                <nav aria-label="Page navigation">
+                  <ul class="pagination">
+                    {%if contacts.has_previous %} {# whether the previous page exists #}
+                    <li class="page-item prev">
+                      <a class="page-link" href="?page={{contacts.previous_page_number}}"><i
+                          class="mdi mdi mdi-chevron-left"></i></a>
+                      {% endif %}
+                    </li>
+                    {% for page_num in contacts.paginator.page_range %}
+                    <li class="page-item {% if page_num == contacts.number %}active{% endif %}">
+                        <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                    </li>
+                    {% endfor %}
+                    {%if contacts.has_next %} {# whether the next page exists #}
+                    <li class="page-item last">
+                      <a class="page-link" href="?page={{contacts.next_page_number}}"><i class="mdi mdi mdi-chevron-right"></i></a>
+                    </li>
+                    {% endif %}
+                  </ul>
+                </nav>
+                <!--/ Basic Pagination -->
+              </div>
+            </div>
+            <table class="table select-table">
+              <thead>
+                <tr>
+                  <th>
+                    <div class="form-check form-check-flat mt-0">
+                      <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" aria-checked="false"><i
+                          class="input-helper"></i></label>
+                    </div>
+                  </th>
+                  <th>Customer</th>
+                  <th>Streem</th>
+                  <th>Last Updated</th>
+                  <th>Next Follow Up</th>
+
+                  <th>No.Of Follow Up</th>
+                  <th>Status</th>
+                  <th>View</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for contact in contacts%}
+                <a href="#">
+                  <tr>
+                    <td>
+                      <div class="form-check form-check-flat mt-0">
+                        <label class="form-check-label">
+                          <input type="checkbox" class="form-check-input" aria-checked="false"><i
+                            class="input-helper"></i></label>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="d-flex ">
+
+                        <div>
+                          <h6>{{contact.name}}</h6>
+                          <p>{{contact.contact_number}}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <h6>{{contact.study_streem}}</h6>
+                      <p>collage: {{contact.collage}}</p>
+                    </td>
+                    
+                    <td>
+                      {{contact.last_follow_up}}
+                    </td>
+                    <th class="text-danger">
+                      {{contact.next_follow_up}}
+                    </th>
+                    <td>
+                      {{contact.number_follow_up}}
+                    </td>
+                    <td>
+                      <div class="badge badge-opacity-warning">{{contact.follow_up_status}}</div>
+                    </td>
+                    <td>
+                      <a href="{%url 'ViewContactData' contact.id %}" target="_blank" class="btn btn-outline-dark btn-sm">View</a>
+                    </td>
+                  </tr>
+                </a>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container pagenator" style="display: flex;justify-content: center;">
+
+
+  <div class="demo-inline-spacing">
+    <!-- Basic Pagination -->
+    <nav aria-label="Page navigation">
+      <ul class="pagination">
+        {%if contacts.has_previous %} {# whether the previous page exists #}
+        <li class="page-item prev">
+          <a class="page-link" href="?page={{contacts.previous_page_number}}"><i
+              class="mdi mdi mdi-chevron-left"></i></a>
+          {% endif %}
+        </li>
+        {% for page_num in contacts.paginator.page_range %}
+        <li class="page-item {% if page_num == contacts.number %}active{% endif %}">
+            <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+        </li>
+        {% endfor %}
+        {%if contacts.has_next %} {# whether the next page exists #}
+        <li class="page-item last">
+          <a class="page-link" href="?page={{contacts.next_page_number}}"><i class="mdi mdi mdi-chevron-right"></i></a>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+    <!--/ Basic Pagination -->
+  </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="basicModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel1">Add New Contact</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST">
+          {% csrf_token %}
+
+          <div class="row g-2">
+            {% for field in form %}
+            <div class="col-md-6 mb-0">
+              <label class="form-label">{{field.label}}</label>
+              {{field}}
+            </div>
+            {% endfor %}
+
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+        <button type="submit" onclick="return confirm('Confirm To add contact to database ?')"
+          class="btn btn-primary">Save changes</button>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal 2 -->
+<div class="modal fade" id="modalCenter" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalCenterTitle">Upload Excel</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <form action="{%url 'import_data_from_excel' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="col mb-3">
+              <label for="nameWithTitle" class="form-label">Upload Excel Sheet To Create Database</label>
+              <input type="file" id="nameWithTitle" class="form-control" name="excel_file" /> <br><br>
+              <button type="submit" class="btn btn-primary">Upload File</button>
+
+            </div>
+        </div>
+        </form>
+
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

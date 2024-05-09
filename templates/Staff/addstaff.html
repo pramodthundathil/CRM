@@ -1,0 +1,201 @@
+{% extends 'index.html' %}
+{% block content %}
+
+<div class="">
+    <div class="row flex-grow">
+        <div class="col-12 grid-margin stretch-card">
+            <div class="card card-rounded">
+                <div class="card-body">
+                    <div class="d-sm-flex justify-content-between align-items-start">
+                        <div>
+                            <h4 class="card-title card-title-dash">Staff Details</h4>
+                            {% for message in messages %}
+                            <div class="message {{message.tags}}">
+                                <p class="card-subtitle card-subtitle-dash {{message.tags}}">{{message}}</p>
+                                <p class="card-subtitle card-subtitle-dash text-danger">{{form.errors}}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div>
+                            <button class="btn btn-primary text-white mb-0 me-0" type="button" data-bs-toggle="modal"
+                                data-bs-target="#basicModal"><i class="mdi mdi-account-plus"></i> Add Staff</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive  mt-1">
+                        <div class="container pagenator" style="display: flex;justify-content: center;">
+            
+            
+                          <div class="demo-inline-spacing">
+                            <!-- Basic Pagination -->
+                            <nav aria-label="Page navigation">
+                              <ul class="pagination">
+                                {%if contacts.has_previous %} {# whether the previous page exists #}
+                                <li class="page-item prev">
+                                  <a class="page-link" href="?page={{contacts.previous_page_number}}"><i
+                                      class="mdi mdi mdi-chevron-left"></i></a>
+                                  {% endif %}
+                                </li>
+                                {% for page_num in contacts.paginator.page_range %}
+                                <li class="page-item {% if page_num == contacts.number %}active{% endif %}">
+                                    <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                                </li>
+                                {% endfor %}
+                                {%if contacts.has_next %} {# whether the next page exists #}
+                                <li class="page-item last">
+                                  <a class="page-link" href="?page={{contacts.next_page_number}}"><i class="mdi mdi mdi-chevron-right"></i></a>
+                                </li>
+                                {% endif %}
+                              </ul>
+                            </nav>
+                            <!--/ Basic Pagination -->
+                          </div>
+                        </div>
+                        <table class="table select-table" >
+                          <thead>
+                            <tr>
+                              <th>
+                                <div class="form-check form-check-flat mt-0">
+                                  <label class="form-check-label">
+                                    <input type="checkbox" class="form-check-input" aria-checked="false"><i
+                                      class="input-helper"></i></label>
+                                </div>
+                              </th>
+                              <th>Sl No.</th>
+                              <th>Staff Name</th>
+                              <th>Username</th>
+                              <th>Last Login</th>
+                              <th>Staff Type</th>
+                              <th>Created Date</th>
+                              <th>Status</th>
+                              <th>View</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for i in staff %}
+                            <a href="#">
+                              <tr>
+                                <td>
+                                  <div class="form-check form-check-flat mt-0">
+                                    
+                                    <label class="form-check-label">
+                                      <input type="checkbox" class="form-check-input" aria-checked="false"><i
+                                        class="input-helper"></i></label>
+                                  </div>
+                                </td>
+                               
+                                <th> {{forloop.counter}}</th>
+                                <td>
+                                  <div class="d-flex ">
+            
+                                    <div>
+                                      <h6>{{i.first_name}}</h6>
+                                      
+                                    </div>
+                                  </div>
+                                </td>
+                                <td>
+                                  <h6>{{i.username}}</h6>
+                                  
+                                </td>
+                                <td>
+                                  {{i.last_login}}
+                                </td>
+                                <td>
+                                  {{i.groups.all.0.name}}
+                                </td>
+                                <td>
+                                  {{i.date_joined}}
+                                </td>
+                                {% if i.is_active == True %}
+                                <td>
+                                  <div class="badge badge-opacity-success">Active</div>
+                                </td>
+                                {% else %}
+                                <td>
+                                    <div class="badge badge-opacity-warning">Inactive</div>
+                                  </td>
+                                  {% endif %}
+
+                                <td>
+                                  <a href="" target="_blank" class="btn btn-outline-dark btn-sm">View</a>
+                                </td>
+                              </tr>
+                            </a>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                      </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="basicModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel1">Add New Staff</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form method="POST">
+            {% csrf_token %}
+  
+            <div class="row g-2">
+              <div class="col-md-6 mb-0 mt-2">
+                <label class="form-label">UserName</label>
+                <input type="text" required placeholder="Username" name="uname" class="form-control">
+                
+              </div>
+              <div class="col-md-6 mb-0 mt-2">
+                <label class="form-label">First name</label>
+                <input type="text" required placeholder="First Name" name="fname" class="form-control">
+                
+              </div>
+              <div class="col-md-6 mb-0 mt-2">
+                <label class="form-label">Email</label>
+                <input type="email" required placeholder="Email Dddress" name="email" class="form-control">
+                
+              </div>
+              <div class="col-md-6 mb-0 mt-2">
+                <label class="form-label">Password</label>
+                <input type="password" required placeholder="Password" name="pswd" class="form-control">
+              </div>
+              <div class="col-md-6 mb-0 mt-2">
+                <label class="form-label">Confirm Password</label>
+                <input type="password" required placeholder="Confirm password" name="pswd1" class="form-control">
+              </div>
+              <div class="col-md-6 mb-0 mt-2">
+                <label class="form-label">Mobile Number</label>
+                <input type="number" required placeholder="Mobile Number" name="mnum" class="form-control">
+              </div>
+              <div class="col-md-6 mb-0 mt-2">
+                <label class="form-label">User Type</label>
+                <select name="utype" id="" class="form-control" required>
+                    <option value="" selected disabled>------------------------</option>
+                    <option value="admin" >Admin</option>
+                    <option value="sadmin" >Semi Admin</option>
+                    <option value="staff">Staff</option>
+                </select>
+                
+              </div>
+              
+  
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            Close
+          </button>
+          <button type="submit" onclick="return confirm('Confirm To add contact to database ?')"
+            class="btn btn-primary">Save changes</button>
+          </form>
+  
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
