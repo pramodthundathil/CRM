@@ -88,18 +88,26 @@ def import_data_from_excel(request):
                 except:
                     continue
                 try:
-                    last_statu = str(row[5])
+                    last_statu = str(row[4])
                 except:
                     last_statu = None 
                 try:
-                    collage=str(row[6])
+                    collage=str(row[5])
                 except:
                     collage = None
                 try:
-                    contacts = StudentContact.objects.create(name=name,contact_number=contact,last_status=last_statu,collage=collage,last_follow_up = row[3])
+                    course=str(row[6])
+                except:
+                    course = None
+                try:
+                    no_follow=int(row[7])
+                except:
+                    no_follow = None
+                try:
+                    contacts = StudentContact.objects.create(name=name,contact_number=contact,last_status=last_statu,study_streem=course,number_follow_up =no_follow,collage=collage,last_follow_up = row[3])
                     contacts.save()
                 except:
-                    contacts = StudentContact.objects.create(name=name,contact_number=contact,last_status=last_statu,collage=collage)
+                    contacts = StudentContact.objects.create(name=name,contact_number=contact,last_status=last_statu,study_streem=course,collage=collage)
                     contacts.save()
         messages.info(request,"excel File Updated....")
                 
