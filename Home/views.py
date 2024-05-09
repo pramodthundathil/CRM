@@ -110,7 +110,7 @@ def Index(request):
         rejected_contacts = StudentContact.objects.filter(lead_follow_up = request.user,last_status = "Rejected",active = True).count()
         pending = StudentContact.objects.filter(lead_follow_up = request.user,next_follow_up__lt = date.today(),active = True).count()
 
-
+    
     context = {
         "contacts_count":contacts_count,
         "warm_contacts":warm_contacts,
