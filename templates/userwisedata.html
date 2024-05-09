@@ -8,7 +8,7 @@
                 <div class="card-body">
                     <div class="d-sm-flex justify-content-between align-items-start">
                         <div>
-                            <h4 class="card-title card-title-dash">Task Details</h4>
+                            <h4 class="card-title card-title-dash">Staff Update Status</h4>
                             {% for message in messages %}
                             <div class="message {{message.tags}}">
                                 <p class="card-subtitle card-subtitle-dash {{message.tags}}">{{message}}</p>
@@ -34,7 +34,7 @@
                                     <div class="media">
                                         <i class="mdi mdi-account icon-md text-info d-flex align-self-center me-3"></i>
                                         <div class="media-body">
-                                            <p class="card-text"><span class="h4"></span>   &nbsp; <a href="{%url 'TodaysNewCalls' %}" class="btn btn-outline-info btn-sm">View</a></p>
+                                            <p class="card-text"><span class="h4"></span>   &nbsp; <a href="{%url 'UpdatesOfstaff' user.id %}" class="btn btn-outline-info btn-sm">View</a></p>
                                         </div>
                                     </div>
                                 </div>

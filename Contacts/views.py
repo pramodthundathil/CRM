@@ -443,6 +443,9 @@ def Search(request):
     return render(request,"searchresults.html",context)
         
     
+# functions for admin Views........................
+
+
 
 def UserWiseData(request):
     users = User.objects.all()
@@ -450,6 +453,163 @@ def UserWiseData(request):
         "users":users
     }
     return render(request,"userwisedata.html",context)
+
+def UpdatesOfstaff(request,pk):
+    user = User.objects.get(id = pk)
+    contact_count = StudentContact.objects.filter(lead_follow_up = user,follow_up_status = "Not Called",active = True ).count()
+    new_contact_count = StudentContact.objects.filter(lead_follow_up = user,follow_up_status = "Not Called", next_follow_up = date.today(),active = True ).count()
+    penidng_call_list = StudentContact.objects.filter(lead_follow_up = user,next_follow_up__lt = date.today(),active = True).count()
+    today_follow_up = StudentContact.objects.filter(lead_follow_up = user,next_follow_up = date.today(),active = True).exclude(follow_up_status = "Not Called").count()
+    upcomming_contacts_count = StudentContact.objects.filter(lead_follow_up = user,next_follow_up__gt = date.today(),active = True).count()
+    today_contacts_completed = StudentContact.objects.filter(lead_follow_up = user,last_follow_up = date.today(),active = True).count()
+
+    context = {
+        "contact_count":contact_count,
+        "penidng_call_list":penidng_call_list,
+        "today_follow_up":today_follow_up,
+        "new_contact_count":new_contact_count,
+        "upcomming_contacts_count":upcomming_contacts_count,
+        "today_contacts_completed":today_contacts_completed,
+        "user":user
+    }
+
+    return render(request,"updatesofstaffs.html",context)
+
+
+def TodaysNewCallsAdmin(request,pk):
+    user1 = User.objects.get(id = pk)
+    contacts= StudentContact.objects.filter(lead_follow_up = user1,follow_up_status = "Not Called", next_follow_up = date.today(),active = True )
+    p = Paginator(contacts, 30)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)  # returns the desired page object
+    except PageNotAnInteger:
+        # if page_number is not an integer then assign the first page
+        page_obj = p.page(1)
+    except EmptyPage:
+        # if page is empty then return last page
+        page_obj = p.page(p.num_pages)
+    context = {
+    "contacts":page_obj,
+    "contacts_count":len(contacts),
+    "user1":user1
+    }  
+    return render(request,"todaysnewcall.html",context)
+
+
+def PendingTocallAdmin(request,pk):
+    user1 = User.objects.get(id = pk)
+
+    contacts = StudentContact.objects.filter(lead_follow_up = user1,next_follow_up__lt = date.today(),active = True)
+    p = Paginator(contacts, 30)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)  # returns the desired page object
+    except PageNotAnInteger:
+        # if page_number is not an integer then assign the first page
+        page_obj = p.page(1)
+    except EmptyPage:
+        # if page is empty then return last page
+        page_obj = p.page(p.num_pages)
+    context = {
+    "contacts":page_obj,
+    "contacts_count":len(contacts),
+    "user1":user1
+    
+    }  
+
+    return render(request,"pendingcontacts.html",context)
+
+def TodaysFollowUpAdmin(request,pk):
+    user1 = User.objects.get(id = pk)
+
+    contacts = StudentContact.objects.filter(lead_follow_up = user1,next_follow_up = date.today(),active = True).exclude(follow_up_status = "Not Called")
+    p = Paginator(contacts, 30)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)  # returns the desired page object
+    except PageNotAnInteger:
+        # if page_number is not an integer then assign the first page
+        page_obj = p.page(1)
+    except EmptyPage:
+        # if page is empty then return last page
+        page_obj = p.page(p.num_pages)
+    context = {
+    "contacts":page_obj,
+    "contacts_count":len(contacts),
+    "user1":user1
+    
+    }  
+
+    return render(request,"todays_follow_up.html",context)
+
+
+def MyAssignmentsAdmin(request,pk):
+    user1 = User.objects.get(id = pk)
+
+    contacts = StudentContact.objects.filter(lead_follow_up = user1,follow_up_status = "Not Called",active = True ).order_by("next_follow_up")
+    contacts_count = StudentContact.objects.filter(lead_follow_up = user1,follow_up_status = "Not Called",active = True).count()
+    users = User.objects.all()
+    p = Paginator(contacts, 30)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)  # returns the desired page object
+    except PageNotAnInteger:
+        # if page_number is not an integer then assign the first page
+        page_obj = p.page(1)
+    except EmptyPage:
+        # if page is empty then return last page
+        page_obj = p.page(p.num_pages)
+
+    context = {
+        "contacts":page_obj,
+        "users":users,
+        "contacts_count":contacts_count,
+        "user1":user1
+    }  
+    return render(request,"myassignments.html",context)
+
+def UpcommingFollowUpAdmin(request,pk):
+    user1 = User.objects.get(id = pk)
+    contacts = StudentContact.objects.filter(lead_follow_up = user1,next_follow_up__gt = date.today(),active = True)
+    p = Paginator(contacts, 30)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)  # returns the desired page object
+    except PageNotAnInteger:
+        # if page_number is not an integer then assign the first page
+        page_obj = p.page(1)
+    except EmptyPage:
+        # if page is empty then return last page
+        page_obj = p.page(p.num_pages)
+    context = {
+    "contacts":page_obj,
+    "contacts_count":len(contacts),
+    "user1":user1
+    }  
+
+    return render(request,"upcommingfollowup.html",context)
+
+def CompletedTodayAdmin(request,pk):
+    user1 = User.objects.get(id = pk)
+    contacts = StudentContact.objects.filter(lead_follow_up = user1,last_follow_up = date.today(),active = True)
+    p = Paginator(contacts, 30)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)  # returns the desired page object
+    except PageNotAnInteger:
+        # if page_number is not an integer then assign the first page
+        page_obj = p.page(1)
+    except EmptyPage:
+        # if page is empty then return last page
+        page_obj = p.page(p.num_pages)
+    context = {
+    "contacts":page_obj,
+    "contacts_count":len(contacts),
+    "user1":user1
+    }  
+
+    return render(request,"leadscompletedtoday.html",context)
 
 
     
