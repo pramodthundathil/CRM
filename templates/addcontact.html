@@ -64,6 +64,8 @@
               </div>
               {% endfor %}
             </div>
+            <form action="{%url 'DeleteContacts' %}" method="post">
+              {% csrf_token %}
             <div>
               <button class="btn btn-primary text-white mb-0 me-0" type="button" data-bs-toggle="modal"
                 data-bs-target="#basicModal"><i class="mdi mdi-account-plus"></i> Add Contact</button>
@@ -72,6 +74,8 @@
                 Import</button>
               <a class="btn btn-warning text-white mb-0 me-0" href="{%url 'FullDataReport' %}" type="button"><i class="mdi mdi mdi-file-excel"></i>
                 Export</a>
+                
+                <button type="submit" onclick="return confirm('Are You Sure Want To delete ??')" class="btn btn-danger text-white mb-0 me-0" href="{%url 'FullDataReport' %}" type="button"><i class="mdi mdi-delete" style="font-size: 18px !important;"></i></button>
             </div>
           </div>
           <div class="table-responsive  mt-1">
@@ -131,7 +135,7 @@
                       <div class="form-check form-check-flat mt-0">
                         
                         <label class="form-check-label">
-                          <input type="checkbox" class="form-check-input contact-checkbox" aria-checked="false"><i
+                          <input type="checkbox" value="{{contact.id}}" name="contact_id" class="form-check-input contact-checkbox" aria-checked="false"><i
                             class="input-helper"></i></label>
                       </div>
                     </td>
@@ -205,6 +209,8 @@
     <!--/ Basic Pagination -->
   </div>
 </div>
+</form>
+
 <!-- Modal -->
 <div class="modal fade" id="basicModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">

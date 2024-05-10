@@ -34,6 +34,7 @@ urlpatterns = [
     path("FullDataReport",views.FullDataReport,name="FullDataReport"),
     path("MyReportTodaysFollowUp",views.MyReportTodaysFollowUp,name="MyReportTodaysFollowUp"),
     path("UpdatedDataAll",views.UpdatedDataAll,name="UpdatedDataAll"),
+    path("DeleteContacts",views.DeleteContacts,name="DeleteContacts"),
 
     
   

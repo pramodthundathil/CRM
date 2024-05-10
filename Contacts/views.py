@@ -790,5 +790,18 @@ def UpdatedDataAll(request):
     response.write(f"Doc Number: {TokenU}")  # Write the unique report number to the next line
     return response
 
+@login_required(login_url='SignIn')
+def DeleteContacts(request):
+    if request.method == "POST":
+        selected_contacts = request.POST.getlist('contact_id')
+    
+        for item in selected_contacts:
+            contact = StudentContact.objects.get(id = int(item))
+            contact.delete()
+        messages.info(request,"selected contact deleted.....")
+        return redirect("AddContact")
+    return redirect("AddContact")
+
+
     
         
