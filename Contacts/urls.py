@@ -30,6 +30,10 @@ urlpatterns = [
     path("MyAssignmentsAdmin/<int:pk>",views.MyAssignmentsAdmin,name="MyAssignmentsAdmin"),
     path("UpcommingFollowUpAdmin/<int:pk>",views.UpcommingFollowUpAdmin,name="UpcommingFollowUpAdmin"),
     path("CompletedTodayAdmin/<int:pk>",views.CompletedTodayAdmin,name="CompletedTodayAdmin"),
+    path("AssignContactsSingle/<int:pk>",views.AssignContactsSingle,name="AssignContactsSingle"),
+    path("FullDataReport",views.FullDataReport,name="FullDataReport"),
+    path("MyReportTodaysFollowUp",views.MyReportTodaysFollowUp,name="MyReportTodaysFollowUp"),
+    path("UpdatedDataAll",views.UpdatedDataAll,name="UpdatedDataAll"),
 
     
   

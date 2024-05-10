@@ -107,10 +107,17 @@ def import_data_from_excel(request):
                 except:
                     no_follow = None
                 try:
-                    contacts = StudentContact.objects.create(name=name,contact_number=contact,last_status=last_statu,study_streem=course,number_follow_up =no_follow,collage=collage,last_follow_up = row[3])
+                    email=int(row[8])
+                except:
+                    email = None
+
+                if StudentContact.objects.filter(contact_number=contact).exists():
+                    continue
+                try:
+                    contacts = StudentContact.objects.create(name=name,contact_number=contact,last_status=last_statu,study_streem=course,number_follow_up =no_follow,collage=collage,last_follow_up = row[3],email = email)
                     contacts.save()
                 except:
-                    contacts = StudentContact.objects.create(name=name,contact_number=contact,last_status=last_statu,study_streem=course,collage=collage)
+                    contacts = StudentContact.objects.create(name=name,contact_number=contact,last_status=last_statu,study_streem=course,collage=collage,email = email)
                     contacts.save()
         messages.info(request,"excel File Updated....")
                 
@@ -146,10 +153,14 @@ def PendingContacts(request):
 def ViewContactData(request,pk):
     contact = StudentContact.objects.get(id = pk)
     leadcall_status = LeadCallStatus.objects.filter(contact = contact)[::-1]
+    users = User.objects.all()
+    dt = date.today()
 
     context = {
         "contact":contact,
-        "leadcall_status":leadcall_status
+        "leadcall_status":leadcall_status,
+        "users":users,
+        "dt":dt
     }
     return render(request,"viewcontactdata.html",context)
 
@@ -192,14 +203,23 @@ def lead_statusUpdate(request,pk,strval):
 @login_required(login_url="login")
 def FollowUpUpadte(request,pk):
     contact = StudentContact.objects.get(id = pk)
+    from datetime import date as dt
     if request.method == "POST":
+        
         date = request.POST["next_follow_up"]
+        
+        dte = dt.today()
         follow_up_status = request.POST["lead_status"]
         follow_up_comments = request.POST['followupcomment']
         follow_up_by = request.user
-
-        lead = LeadCallStatus.objects.create(contact = contact,follow_up_status = follow_up_status, follow_up_comments = follow_up_comments,follow_up_by  = follow_up_by, next_follow_up = date )
-        lead.save()
+        
+        try:
+            lead = LeadCallStatus.objects.create(contact = contact,follow_up_status = follow_up_status, follow_up_comments = follow_up_comments,follow_up_by  = follow_up_by, next_follow_up = date )
+            lead.save()
+        except:
+            lead = LeadCallStatus.objects.create(contact = contact,follow_up_status = follow_up_status, follow_up_comments = follow_up_comments,follow_up_by  = follow_up_by, next_follow_up = dte )
+            lead.save()
+            date = dte
 
         if contact.follow_up_started_date == None: # if the follow up is not started need to update the followup started date
            contact.follow_up_started_date = datetime.now()
@@ -212,8 +232,9 @@ def FollowUpUpadte(request,pk):
         contact.next_follow_up = date
         contact.lead_follow_up = request.user
         contact.save()
-        if contact.follow_up_status == "Rejected":
+        if contact.follow_up_status == "Rejected" or contact.follow_up_status == "Not intrested" :
             contact.active = False
+            contact.next_follow_up = None
             contact.save()
         messages.info(request,"Status updated....")
         
@@ -259,6 +280,20 @@ def AssignContacts(request):
         "contacts_count":contacts_count
     }
     return render(request,'assigntostaff.html',context)
+
+@login_required(login_url="login")
+def AssignContactsSingle(request,pk):
+    contact = StudentContact.objects.get(id = pk)
+    if request.method == "POST":
+        user_id = request.POST['user']
+        user = User.objects.get(id = int(user_id))
+        contact.lead_follow_up = user
+        contact.save()
+        messages.info(request,"New Staff assigned To contact follow up")
+        return redirect("ViewContactData",pk = pk)
+    return redirect("ViewContactData",pk = pk)
+    
+
 
 
 @login_required(login_url="login")
@@ -455,6 +490,7 @@ def CompletedToday(request):
     }  
 
     return render(request,"leadscompletedtoday.html",context)
+
 from django.db.models import Q
 @login_required(login_url="login")
 def Search(request):
@@ -647,6 +683,112 @@ def CompletedTodayAdmin(request,pk):
 
     return render(request,"leadscompletedtoday.html",context)
 
+
+# report generation for data 
+
+
+from xhtml2pdf import pisa
+from datetime import datetime, timedelta
+from django.utils import timezone
+from django.http import HttpResponse
+import csv
+
+this_month = timezone.now().month
+today = timezone.now()
+start_date = today + timedelta(days=-5)
+end_date = today + timedelta(days=5)
+resign_date = today +timedelta(days = -30)
+
+@login_required(login_url='SignIn')
+def FullDataReport(request):
+    
+    date = timezone.now().month
+    date_year = timezone.now().year
+    response = HttpResponse(content_type = 'text/csv')
+    response['Content-Disposition'] = 'attachment; filename=Leaddatafullreport{}-{}.csv'.format(date,date_year)
+    
+    STUDENT = StudentContact.objects.all().order_by("added_date")
+    def generate_serial_number():
+        current_time = datetime.now()
+        serial_number = current_time.strftime("%Y%m%d%H%M%S")
+        return serial_number
+    TokenU = generate_serial_number()
+    writer = csv.writer(response)
+    response.write('\n')  # Move to the next line after the first row
+    response.write("FULL STUDENT DATABASE ")  # Write the unique report number to the next line
+    writer.writerow(["Sl No",'Name',"PHONE NUMBER","FOLLOWUP DATE","REMARKS","COLLEGE","COURSE","NO: FOLLOW UP","EMAIL","FOLLOW UP BY","FOLLOWUP STATUS","NEXT FOLLOW UP"])
+    counter = 0
+    for i in STUDENT:
+        counter +=1
+        try:
+            staff = i.lead_follow_up.first_name
+        except:
+            staff = "Not assigned"
+        writer.writerow([counter,i.name,i.contact_number,i.last_follow_up,i.last_status,i.collage,i.study_streem,i.number_follow_up,i.email,staff,i.follow_up_status,i.next_follow_up])
+    response.write('\n')  # Move to the next line after the first row
+    response.write(f"Doc Number: {TokenU}")  # Write the unique report number to the next line
+    return response
+
+from datetime import date as dt
+
+@login_required(login_url='SignIn')
+def MyReportTodaysFollowUp(request):
+    date = timezone.now().month
+    date_year = timezone.now().year
+    response = HttpResponse(content_type = 'text/csv')
+    response['Content-Disposition'] = 'attachment; filename=Callreporton-{}-{}.csv'.format(request.user.first_name,dt.today())
+    
+    STUDENT = StudentContact.objects.filter(lead_follow_up = request.user,last_follow_up = dt.today(),active = True)
+    def generate_serial_number():
+        current_time = datetime.now()
+        serial_number = current_time.strftime("%Y%m%d%H%M%S")
+        return serial_number
+    TokenU = generate_serial_number()
+    writer = csv.writer(response)
+    response.write('\n')  # Move to the next line after the first row
+    response.write("FULL STUDENT DATABASE ")  # Write the unique report number to the next line
+    writer.writerow(["Sl No",'Name',"PHONE NUMBER","FOLLOWUP DATE","REMARKS","COLLEGE","COURSE","NO: FOLLOW UP","EMAIL","FOLLOW UP BY","FOLLOWUP STATUS","NEXT FOLLOW UP"])
+    counter = 0
+    for i in STUDENT:
+        counter +=1
+        try:
+            staff = i.lead_follow_up.first_name
+        except:
+            staff = "Not assigned"
+        writer.writerow([counter,i.name,i.contact_number,i.last_follow_up,i.last_status,i.collage,i.study_streem,i.number_follow_up,i.email,staff,i.follow_up_status,i.next_follow_up])
+    response.write('\n')  # Move to the next line after the first row
+    response.write(f"Doc Number: {TokenU}")  # Write the unique report number to the next line
+    return response
+
+
+@login_required(login_url='SignIn')
+def UpdatedDataAll(request):
+    date = timezone.now().month
+    date_year = timezone.now().year
+    response = HttpResponse(content_type = 'text/csv')
+    response['Content-Disposition'] = 'attachment; filename=Callreporton-{}-{}.csv'.format("fulldata Report on",dt.today())
+    
+    STUDENT = StudentContact.objects.filter(active = True).exclude(follow_up_status = "Not Called")
+    def generate_serial_number():
+        current_time = datetime.now()
+        serial_number = current_time.strftime("%Y%m%d%H%M%S")
+        return serial_number
+    TokenU = generate_serial_number()
+    writer = csv.writer(response)
+    response.write('\n')  # Move to the next line after the first row
+    response.write("FULL STUDENT DATABASE ")  # Write the unique report number to the next line
+    writer.writerow(["Sl No",'Name',"PHONE NUMBER","FOLLOWUP DATE","REMARKS","COLLEGE","COURSE","NO: FOLLOW UP","EMAIL","FOLLOW UP BY","FOLLOWUP STATUS","NEXT FOLLOW UP"])
+    counter = 0
+    for i in STUDENT:
+        counter +=1
+        try:
+            staff = i.lead_follow_up.first_name
+        except:
+            staff = "Not assigned"
+        writer.writerow([counter,i.name,i.contact_number,i.last_follow_up,i.last_status,i.collage,i.study_streem,i.number_follow_up,i.email,staff,i.follow_up_status,i.next_follow_up])
+    response.write('\n')  # Move to the next line after the first row
+    response.write(f"Doc Number: {TokenU}")  # Write the unique report number to the next line
+    return response
 
     
         

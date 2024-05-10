@@ -13,5 +13,7 @@ urlpatterns = [
     path('logout', views.SignOut, name='logout'),
     path("SataffUserCreations",views.SataffUserCreations,name="SataffUserCreations"),
     path("Mytasks",views.Mytasks,name="Mytasks"),
+    path("Settings",views.Settings,name="Settings"),
+    path("ChangePassword",views.ChangePassword,name="ChangePassword")
     
 ]  

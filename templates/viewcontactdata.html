@@ -119,6 +119,12 @@
                     </tr>
                   </table>
                 </ul>
+                {% if request.user.groups.all.0.name == 'admin' or request.user.groups.all.0.name == 'sadmin' %}
+                <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                  Assign To New Staff
+                </button>
+                {% endif %}
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Follow Up Staff : <span class="h2 text-primary">{{contact.lead_follow_up.first_name}}</span>
 
               </div>
               <div class="container bg-light mb-3 p-3">
@@ -158,8 +164,11 @@
                     <i class="ti-user"></i>
                     Update Status
                   </button>
-
+                 
+                  
+                
                 </fieldset>
+                
 
               </div>
 
@@ -234,7 +243,7 @@
                 <div class="form-group row">
                   <label class="col-sm-3 col-form-label">Next Follow Up</label>
                   <div class="col-sm-9">
-                    <input type="date" id="dateInput" name="next_follow_up" class="form-control" required />
+                    <input type="date" id="dateInput" name="next_follow_up" class="form-control"/>
                   </div>
                 </div>
               </div>
@@ -245,7 +254,7 @@
                     <select class="form-control" name="lead_status" required>
                       
                       <option value="Normal">Normal</option>
-                      <option value="RNA">RNA</option>
+                      <option value="RNR">RNR</option>
                       <option value="Not Taken">Not Taken</option>
                       <option value="Not intrested">Not intrested</option>
                       <option value="Intrested">Intrested</option>
@@ -274,6 +283,40 @@
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </form>
 
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Button trigger modal -->
+
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Assign New Staff</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+       <form action="{%url 'AssignContactsSingle' contact.id %}" method="post">
+        {% csrf_token %}
+        <select name="user" id="" required class="form-control">
+          <option value="" selected disabled>---------------------------</option>
+          {% for i in users %}
+          {% if i.groups.all.0.name == 'sadmin' or i.groups.all.0.name == 'staff' %}
+          <option value="{{i.id}}">{{i.first_name}}</option>
+          {% endif%}
+          {% endfor %}
+        </select>
+        <br><br>
+        <button type="submit" class="btn btn-primary">Assign To Staff</button>
+
+       </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
   </div>

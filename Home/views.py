@@ -76,7 +76,7 @@ def SignUp(request):
 
 def SignOut(request):
     logout(request)
-    return render(request,'login.html')
+    return redirect('login')
 
 
 # index pages and utilities area 
@@ -220,6 +220,34 @@ def Mytasks(request):
         "today_contacts_completed":today_contacts_completed
     }
     return render(request,"todaystasks.html",context)
+
+
+@login_required(login_url="login")
+def Settings(request):
+    return render(request,"settings.html")
+
+@login_required(login_url='login')
+def ChangePassword(request):
+    if request.method == "POST":
+        oldpass = request.POST["cpswd"]
+        newpass1 = request.POST['npswd']
+        newpass2 = request.POST['nconpswd']
+        user1 = authenticate(request,username = request.user.username,password = oldpass)
+        if user1 is not None:
+            if newpass1 == newpass2:
+                user  = request.user 
+                user.set_password(newpass1)
+                user.save()
+                messages.success(request, "Password Change Success Please Login To Continue..")
+                return redirect("Settings")
+            else:
+                messages.error(request, "Password not Matching..")
+                return redirect("Settings")
+        else:
+            messages.error(request, "Password is incorrect")
+            return redirect("Settings")
+
+    return redirect("Settings")
 
 
 
