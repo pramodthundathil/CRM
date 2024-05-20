@@ -54,6 +54,7 @@
           <div class="d-sm-flex justify-content-between align-items-start">
             <div>
               <h4 class="card-title card-title-dash">Calls Completed Today <span class="text-primary"></span>   <span class="text-small">({{contacts_count}} Contacts)</span> </h4>
+              <a href="{%url 'Mytasks' %}" class="nav-link"><h4 class="text-info d-flex align-items-center"><i class="mdi mdi-arrow-left-bold-circle-outline icon-md text-info  align-self-center"></i> Back To Leads</h4></a>
               {% for message in messages %}
               <div class="message {{message.tags}}">
                 <p class="card-subtitle card-subtitle-dash {{message.tags}}">{{message}}</p>
@@ -157,7 +158,7 @@
                       <div class="badge badge-opacity-warning">{{contact.follow_up_status}}</div>
                     </td>
                     <td>
-                      <a href="{%url 'ViewContactData' contact.id %}" target="_blank" class="btn btn-outline-dark btn-sm">View</a>
+                      <a href="{%url 'ViewContactData' contact.id %}" class="btn btn-outline-dark btn-sm">View</a>
                     </td>
                   </tr>
                 </a>

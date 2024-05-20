@@ -387,7 +387,20 @@ def TodaysFollowUp(request):
 
 @login_required(login_url="login")
 def UpcommingFollowUp(request):
-    contacts = StudentContact.objects.filter(lead_follow_up = request.user,next_follow_up__gt = date.today(),active = True)
+    # contacts = StudentContact.objects.filter(lead_follow_up = request.user,next_follow_up__gt = date.today(),active = True)
+    from datetime import date, timedelta
+
+    # Define the date range
+    start_date = date.today()
+    end_date = start_date + timedelta(days=7)
+
+    # Query the StudentContact objects
+    contacts = StudentContact.objects.filter(
+        lead_follow_up=request.user,
+        next_follow_up__range=(start_date, end_date),
+        active=True
+    )
+
     p = Paginator(contacts, 30)
     page_number = request.GET.get('page')
     try:
@@ -473,7 +486,7 @@ def ConvertedLeads(request):
 
 @login_required(login_url="login")
 def CompletedToday(request):
-    contacts = StudentContact.objects.filter(lead_follow_up = request.user,last_follow_up = date.today(),active = True)
+    contacts = StudentContact.objects.filter(lead_follow_up = request.user,last_follow_up = date.today())
     p = Paginator(contacts, 30)
     page_number = request.GET.get('page')
     try:
@@ -491,20 +504,7 @@ def CompletedToday(request):
 
     return render(request,"leadscompletedtoday.html",context)
 
-from django.db.models import Q
-@login_required(login_url="login")
-def Search(request):
-    contacts = None
-    if request.method == "POST":
-        search = request.POST['search']
-        contacts = StudentContact.objects.filter(
-            Q(name__icontains=search) | Q(collage__icontains=search)
-        )
-    
-    context = {
-        "contacts":contacts
-    }
-    return render(request,"searchresults.html",context)
+
         
     
 # functions for admin Views........................
@@ -801,6 +801,106 @@ def DeleteContacts(request):
         messages.info(request,"selected contact deleted.....")
         return redirect("AddContact")
     return redirect("AddContact")
+
+
+def RejectedCallList(request):
+    contacts = StudentContact.objects.filter(lead_follow_up = request.user,active = False)
+    p = Paginator(contacts, 30)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)  # returns the desired page object
+    except PageNotAnInteger:
+        # if page_number is not an integer then assign the first page
+        page_obj = p.page(1)
+    except EmptyPage:
+        # if page is empty then return last page
+        page_obj = p.page(p.num_pages)
+    context = {
+    "contacts":page_obj,
+    "contacts_count":len(contacts),
+    "user1":request.user
+    }  
+
+    return render(request,"rejectedcalls.html",context)
+
+
+def AllCallList(request):
+    contacts = StudentContact.objects.filter(lead_follow_up = request.user,active = True)
+    p = Paginator(contacts, 30)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)  # returns the desired page object
+    except PageNotAnInteger:
+        # if page_number is not an integer then assign the first page
+        page_obj = p.page(1)
+    except EmptyPage:
+        # if page is empty then return last page
+        page_obj = p.page(p.num_pages)
+    context = {
+    "contacts":page_obj,
+    "contacts_count":len(contacts),
+    "user1":request.user
+    }  
+
+    return render(request,"Allcalls.html",context)
+
+
+from django.db.models import Q
+@login_required(login_url="login")
+def Search(request):
+    contacts = None
+    if request.method == "POST":
+        search = request.POST['search']
+        contacts = StudentContact.objects.filter(
+            Q(name__icontains=search) | Q(collage__icontains=search)
+        )
+    p = Paginator(contacts, 30)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)  # returns the desired page object
+    except PageNotAnInteger:
+        # if page_number is not an integer then assign the first page
+        page_obj = p.page(1)
+    except EmptyPage:
+        # if page is empty then return last page
+        page_obj = p.page(p.num_pages)
+    
+    context = {
+        "contacts":page_obj
+    }
+    return render(request,"searchresults.html",context)
+
+
+def SearchBydate(request):
+    contacts = None
+    if request.method == "POST":
+        sdate = request.POST['sdate']
+        edate = request.POST['edate']
+        leadstatus = request.POST["leadstatus"]
+        if leadstatus == "all":
+            contacts = StudentContact.objects.filter(last_follow_up__gte = sdate, last_follow_up__lte = edate, active = True)
+        else:
+            contacts = StudentContact.objects.filter(last_follow_up__gte = sdate, last_follow_up__lte = edate, follow_up_status = leadstatus )
+
+
+
+    p = Paginator(contacts, 30)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)  # returns the desired page object
+    except PageNotAnInteger:
+        # if page_number is not an integer then assign the first page
+        page_obj = p.page(1)
+    except EmptyPage:
+        # if page is empty then return last page
+        page_obj = p.page(p.num_pages)
+    
+    context = {
+        "contacts":page_obj
+    }
+    return render(request,"searchresults.html",context)
+
+
 
 
     

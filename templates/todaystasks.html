@@ -9,15 +9,19 @@
                     <div class="d-sm-flex justify-content-between align-items-start">
                         <div>
                             <h4 class="card-title card-title-dash">Task Details</h4>
-                            {% for message in messages %}
+              {% for message in messages %}
                             <div class="message {{message.tags}}">
                                 <p class="card-subtitle card-subtitle-dash {{message.tags}}">{{message}}</p>
                                 <p class="card-subtitle card-subtitle-dash text-danger">{{form.errors}}</p>
                             </div>
                             {% endfor %}
+
                         </div>
                         <div>
-                            
+                            <button class="btn btn-primary text-white mb-0 me-0" type="button" data-bs-toggle="modal"
+                                data-bs-target="#basicModal"><i class="mdi mdi-account-search h2"></i> Search
+                                Contacts</button>
+
                         </div>
                     </div>
 
@@ -29,9 +33,12 @@
                                 <div class="card-body">
                                     <h4 class="card-title">Todays New Calls</h4>
                                     <div class="media">
-                                        <i class="mdi mdi-phone-classic icon-md text-info d-flex align-self-center me-3"></i>
+                                        <i
+                                            class="mdi mdi-phone-classic icon-md text-info d-flex align-self-center me-3"></i>
                                         <div class="media-body">
-                                            <p class="card-text"><span class="h4">{{new_contact_count}}</span>  contacts &nbsp; <a href="{%url 'TodaysNewCalls' %}" class="btn btn-outline-info btn-sm">View</a></p>
+                                            <p class="card-text"><span class="h4">{{new_contact_count}}</span> contacts
+                                                &nbsp; <a href="{%url 'TodaysNewCalls' %}"
+                                                    class="btn btn-outline-info btn-sm">View</a></p>
                                         </div>
                                     </div>
                                 </div>
@@ -42,9 +49,12 @@
                                 <div class="card-body">
                                     <h4 class="card-title">Pending Call List</h4>
                                     <div class="media">
-                                        <i class="mdi mdi-phone-paused icon-md text-info d-flex align-self-center me-3"></i>
+                                        <i
+                                            class="mdi mdi-phone-paused icon-md text-info d-flex align-self-center me-3"></i>
                                         <div class="media-body">
-                                            <p class="card-text"><span class="h4">{{penidng_call_list}}</span>  contacts <a href="{%url 'PendingTocall' %}" class="btn btn-outline-info btn-sm">View</a></p>
+                                            <p class="card-text"><span class="h4">{{penidng_call_list}}</span> contacts
+                                                <a href="{%url 'PendingTocall' %}"
+                                                    class="btn btn-outline-info btn-sm">View</a></p>
                                         </div>
                                     </div>
                                 </div>
@@ -55,9 +65,12 @@
                                 <div class="card-body">
                                     <h4 class="card-title">Follow Up For Today</h4>
                                     <div class="media">
-                                        <i class="mdi mdi-phone-in-talk icon-md text-info d-flex align-self-center me-3"></i>
+                                        <i
+                                            class="mdi mdi-phone-in-talk icon-md text-info d-flex align-self-center me-3"></i>
                                         <div class="media-body">
-                                            <p class="card-text"><span class="h4">{{today_follow_up}}</span>  contacts <a href="{%url 'TodaysFollowUp' %}" class="btn btn-outline-info btn-sm">View</a></p>
+                                            <p class="card-text"><span class="h4">{{today_follow_up}}</span> contacts <a
+                                                    href="{%url 'TodaysFollowUp' %}"
+                                                    class="btn btn-outline-info btn-sm">View</a></p>
                                         </div>
                                     </div>
                                 </div>
@@ -68,9 +81,12 @@
                                 <div class="card-body">
                                     <h4 class="card-title">All Assignments not Called</h4>
                                     <div class="media">
-                                        <i class="mdi mdi-phone-log icon-md text-info d-flex align-self-center me-3"></i>
+                                        <i
+                                            class="mdi mdi-phone-log icon-md text-info d-flex align-self-center me-3"></i>
                                         <div class="media-body">
-                                            <p class="card-text"><span class="h4">{{contact_count}}</span>  contacts <a href="{%url 'MyAssignments' %}" class="btn btn-outline-info btn-sm">View</a></p>
+                                            <p class="card-text"><span class="h4">{{contact_count}}</span> contacts <a
+                                                    href="{%url 'MyAssignments' %}"
+                                                    class="btn btn-outline-info btn-sm">View</a></p>
                                         </div>
                                     </div>
                                 </div>
@@ -82,24 +98,33 @@
                                 <div class="card-body">
                                     <h4 class="card-title">Upcomming Follow Up</h4>
                                     <div class="media">
-                                        <i class="mdi mdi-phone-incoming icon-md text-info d-flex align-self-center me-3"></i>
+                                        <i
+                                            class="mdi mdi-phone-incoming icon-md text-info d-flex align-self-center me-3"></i>
                                         <div class="media-body">
-                                            <p class="card-text"><span class="h4">{{upcomming_contacts_count}}</span>  contacts <a href="{%url 'UpcommingFollowUp' %}" class="btn btn-outline-info btn-sm">View</a></p>
+                                            <p class="card-text"><span class="h4">{{upcomming_contacts_count}}</span>
+                                                contacts <a href="{%url 'UpcommingFollowUp' %}"
+                                                    class="btn btn-outline-info btn-sm">View</a></p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        
+
                         <div class="col-md-4 grid-margin stretch-card">
                             <div class="card">
                                 <div class="card-body">
                                     <h4 class="card-title">Completed Today</h4>
                                     <div class="media">
-                                        <i class="mdi mdi-phone-voip icon-md text-info d-flex align-self-center me-3"></i>
+                                        <i
+                                            class="mdi mdi-phone-voip icon-md text-info d-flex align-self-center me-3"></i>
                                         <div class="media-body">
-                                            <p class="card-text"><span class="h4">{{today_contacts_completed}}</span>  contacts <a href="{%url 'CompletedToday'%}" class="btn btn-outline-info btn-sm">View</a> &nbsp;&nbsp;&nbsp; <a href="{%url 'MyReportTodaysFollowUp' %}" class="btn btn-outline-primary btn-sm"><i class="mdi mdi-file-excel"></i>Report</a></p>
+                                            <p class="card-text"><span class="h4">{{today_contacts_completed}}</span>
+                                                contacts <a href="{%url 'CompletedToday'%}"
+                                                    class="btn btn-outline-info btn-sm">View</a> &nbsp;&nbsp;&nbsp; <a
+                                                    href="{%url 'MyReportTodaysFollowUp' %}"
+                                                    class="btn btn-outline-primary btn-sm"><i
+                                                        class="mdi mdi-file-excel"></i>Report</a></p>
                                         </div>
                                     </div>
                                 </div>
@@ -107,7 +132,48 @@
                         </div>
 
 
-                        
+                        <div class="col-md-4 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">All Leads</h4>
+                                    <div class="media">
+                                        <i
+                                            class="mdi mdi-phone-voip icon-md text-info d-flex align-self-center me-3"></i>
+                                        <div class="media-body">
+                                            <p class="card-text"><span class="h4">{{all_contacts}}</span>
+                                                contacts <a href="{%url 'AllCallList' %}"
+                                                    class="btn btn-outline-info btn-sm">View</a> &nbsp;&nbsp;&nbsp; <a
+                                                    href="{%url 'MyReportTodaysFollowUp' %}"
+                                                    class="btn btn-outline-primary btn-sm"><i
+                                                        class="mdi mdi-file-excel"></i>Report</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">Rejected Or Deleted</h4>
+                                    <div class="media">
+                                        <i
+                                            class="mdi mdi-phone-voip icon-md text-danger d-flex align-self-center me-3"></i>
+                                        <div class="media-body">
+                                            <p class="card-text"><span class="h4">{{rejected_contacts}}</span>
+                                                contacts <a href="{%url 'RejectedCallList' %}"
+                                                    class="btn btn-outline-info btn-sm">View</a> &nbsp;&nbsp;&nbsp; <a
+                                                    href="{%url 'MyReportTodaysFollowUp' %}"
+                                                    class="btn btn-outline-primary btn-sm"><i
+                                                        class="mdi mdi-file-excel"></i>Report</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
 
                     </div>
                 </div>
@@ -116,8 +182,72 @@
     </div>
 </div>
 
+<!-- Modal -->
+<div class="modal fade" id="basicModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel1">
+                    <h3> Search By Date </h3>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{%url 'SearchBydate' %}" >
+                    {% csrf_token %}
+                    <div class="row g-2" style="padding: 30px;">
+                        <div class="col-md-12 mb-2">
+                            <label for="">
+                                Startig Date:
+                            </label>
+                            <input oninput="dateSort()" type="date" class="form-control" required name="sdate" id="sdate">
+
+                        </div>
+                        <div class="col-md-12 mb-2">
+                            <label for="">
+                                Ending Date:
+                            </label>
+                            <input type="date" class="form-control" required name="edate" id="edate">
+
+                        </div>
+                        <div class="col-md-12 mb-2">
+                            <label for="">
+                                Category
+                            </label>
+                            <select name="leadstatus" required class="form-control" id="">
+                                <option value="all" selected>All</option>
+                                <option value="Not Called" >Not Called</option>
+                                <option value="RNR" >RNR</option>
+                                <option value="Not intrested" >Not intrested</option>
+                                <option value="Line Busy" >Line Busy</option>
+                                <option value="Intrested" >Intrested</option>
+                                <option value="Sligtly Intrested" >Sligtly Intrested</option>
+                                <option value="Call Back" >Call Back</option>
+                            </select>
+
+                        </div>
+                        <br><br>
+                        <div class="col-md-12 mb-0">
+                            <button type="submit" class="btn btn-primary">Search</button>
+                        </div>
+                        
+
+                    </div>
+                </form>
 
 
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<script>
+    function dateSort(){
+        let sdate = document.getElementById("sdate").value 
+        document.getElementById("edate").setAttribute("min", sdate);
+    }
+</script>
 
 
 {% endblock %}

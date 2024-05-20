@@ -209,7 +209,10 @@ def Mytasks(request):
     penidng_call_list = StudentContact.objects.filter(lead_follow_up = request.user,next_follow_up__lt = date.today(),active = True).count()
     today_follow_up = StudentContact.objects.filter(lead_follow_up = request.user,next_follow_up = date.today(),active = True).exclude(follow_up_status = "Not Called").count()
     upcomming_contacts_count = StudentContact.objects.filter(lead_follow_up = request.user,next_follow_up__gt = date.today(),active = True).count()
-    today_contacts_completed = StudentContact.objects.filter(lead_follow_up = request.user,last_follow_up = date.today(),active = True).count()
+    today_contacts_completed = StudentContact.objects.filter(lead_follow_up = request.user,last_follow_up = date.today()).count()
+    rejected_contacts = StudentContact.objects.filter(lead_follow_up = request.user,active = False).count()
+    all_contacts = StudentContact.objects.filter(lead_follow_up = request.user,active = True).count()
+
 
     context = {
         "contact_count":contact_count,
@@ -217,7 +220,9 @@ def Mytasks(request):
         "today_follow_up":today_follow_up,
         "new_contact_count":new_contact_count,
         "upcomming_contacts_count":upcomming_contacts_count,
-        "today_contacts_completed":today_contacts_completed
+        "today_contacts_completed":today_contacts_completed,
+        "rejected_contacts":rejected_contacts,
+        "all_contacts":all_contacts
     }
     return render(request,"todaystasks.html",context)
 
@@ -248,6 +253,8 @@ def ChangePassword(request):
             return redirect("Settings")
 
     return redirect("Settings")
+
+
 
 
 

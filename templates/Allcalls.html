@@ -47,13 +47,13 @@
 
 
 <div class="">
-  <div class="row flex-grow">
+  <div class="row flex-grow"> 
     <div class="col-12 grid-margin stretch-card">
       <div class="card card-rounded">
         <div class="card-body">
           <div class="d-sm-flex justify-content-between align-items-start">
             <div>
-              <h4 class="card-title card-title-dash">Todays Follow Up <span class="text-primary">{{user1.first_name}}</span>  <span class="text-small">({{contacts_count}} Contacts)</span> </h4>
+              <h4 class="card-title card-title-dash">All Leads <span class="text-primary">{{user1.first_name}}</span>  <span class="text-small">({{contacts_count}} Contacts)</span> </h4>
               <a href="{%url 'Mytasks' %}" class="nav-link"><h4 class="text-info d-flex align-items-center"><i class="mdi mdi-arrow-left-bold-circle-outline icon-md text-info  align-self-center"></i> Back To Leads</h4></a>
               {% for message in messages %}
               <div class="message {{message.tags}}">
@@ -121,7 +121,7 @@
                 </tr>
               </thead>
               <tbody>
-                {% for contact in contacts%}
+                {% for contact in contacts %}
                 <a href="#">
                   <tr>
                     <td>

@@ -120,7 +120,7 @@
                 </tr>
               </thead>
               <tbody>
-                {% for contact in contacts%}
+                {% for contact in contacts %}
                 <a href="#">
                   <tr>
                     <td>
@@ -157,7 +157,7 @@
                       <div class="badge badge-opacity-warning">{{contact.follow_up_status}}</div>
                     </td>
                     <td>
-                      <a href="{%url 'ViewContactData' contact.id %}" target="_blank" class="btn btn-outline-dark btn-sm">View</a>
+                      <a href="{%url 'ViewContactData' contact.id %}" class="btn btn-outline-dark btn-sm">View</a>
                     </td>
                   </tr>
                 </a>
@@ -199,72 +199,6 @@
     <!--/ Basic Pagination -->
   </div>
 </div>
-<!-- Modal -->
-<div class="modal fade" id="basicModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel1">Add New Contact</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form method="POST">
-          {% csrf_token %}
 
-          <div class="row g-2">
-            {% for field in form %}
-            <div class="col-md-6 mb-0">
-              <label class="form-label">{{field.label}}</label>
-              {{field}}
-            </div>
-            {% endfor %}
-
-          </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-          Close
-        </button>
-        <button type="submit" onclick="return confirm('Confirm To add contact to database ?')"
-          class="btn btn-primary">Save changes</button>
-        </form>
-
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- Modal 2 -->
-<div class="modal fade" id="modalCenter" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="modalCenterTitle">Upload Excel</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="row">
-          <form action="{%url 'import_data_from_excel' %}" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="col mb-3">
-              <label for="nameWithTitle" class="form-label">Upload Excel Sheet To Create Database</label>
-              <input type="file" id="nameWithTitle" class="form-control" name="excel_file" /> <br><br>
-              <button type="submit" class="btn btn-primary">Upload File</button>
-
-            </div>
-        </div>
-        </form>
-
-
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-          Close
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
 
 {% endblock %}

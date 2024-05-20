@@ -23,6 +23,7 @@ urlpatterns = [
     path("UserWiseData",views.UserWiseData,name="UserWiseData"),
     path("CompletedToday",views.CompletedToday,name="CompletedToday"),
     path("Search",views.Search,name="Search"),
+    path("SearchBydate",views.SearchBydate,name="SearchBydate"),
     path("UpdatesOfstaff/<int:pk>",views.UpdatesOfstaff,name="UpdatesOfstaff"),
     path("TodaysNewCallsAdmin/<int:pk>",views.TodaysNewCallsAdmin,name="TodaysNewCallsAdmin"),
     path("PendingTocallAdmin/<int:pk>",views.PendingTocallAdmin,name="PendingTocallAdmin"),
@@ -35,7 +36,8 @@ urlpatterns = [
     path("MyReportTodaysFollowUp",views.MyReportTodaysFollowUp,name="MyReportTodaysFollowUp"),
     path("UpdatedDataAll",views.UpdatedDataAll,name="UpdatedDataAll"),
     path("DeleteContacts",views.DeleteContacts,name="DeleteContacts"),
-
-    
+    path("AllCallList",views.AllCallList,name="AllCallList"),
+    path("RejectedCallList",views.RejectedCallList,name="RejectedCallList"),
+  
   
 ]  
