@@ -24,6 +24,7 @@ urlpatterns = [
     path("CompletedToday",views.CompletedToday,name="CompletedToday"),
     path("Search",views.Search,name="Search"),
     path("SearchBydate",views.SearchBydate,name="SearchBydate"),
+    path("SearchBydateadmin",views.SearchBydateadmin,name="SearchBydateadmin"),
     path("UpdatesOfstaff/<int:pk>",views.UpdatesOfstaff,name="UpdatesOfstaff"),
     path("TodaysNewCallsAdmin/<int:pk>",views.TodaysNewCallsAdmin,name="TodaysNewCallsAdmin"),
     path("PendingTocallAdmin/<int:pk>",views.PendingTocallAdmin,name="PendingTocallAdmin"),

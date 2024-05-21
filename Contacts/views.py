@@ -992,6 +992,48 @@ def SearchBydate(request):
 
 
 
+def SearchBydateadmin(request):
+    contacts = None
+    if request.method == "POST":
+        sdate = request.POST['sdate']
+        edate = request.POST['edate']
+        leadstatus = request.POST["leadstatus"]
+        user = request.POST['user']
+        try:
+            user = User.objects.get(id = int(user))
+        except:
+            user = "all"
+        if leadstatus == "all":
+            if user == "all":
+                contacts = StudentContact.objects.filter(last_follow_up__gte = sdate, last_follow_up__lte = edate, active = True)
+            else:
+                contacts = StudentContact.objects.filter(lead_follow_up = user,last_follow_up__gte = sdate, last_follow_up__lte = edate, active = True,)
+
+        else:
+            if user == "all":
+                contacts = StudentContact.objects.filter(last_follow_up__gte = sdate, last_follow_up__lte = edate, follow_up_status = leadstatus )
+            else:
+                contacts = StudentContact.objects.filter(lead_follow_up = user,last_follow_up__gte = sdate, last_follow_up__lte = edate, active = True,)
+
+    p = Paginator(contacts, 30)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)  # returns the desired page object
+    except PageNotAnInteger:
+        # if page_number is not an integer then assign the first page
+        page_obj = p.page(1)
+    except EmptyPage:
+        # if page is empty then return last page
+        page_obj = p.page(p.num_pages)
+    
+    context = {
+        "contacts":page_obj
+    }
+    return render(request,"searchresults.html",context)
+
+
+
+
 
 
 
