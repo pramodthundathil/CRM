@@ -212,6 +212,8 @@ def Mytasks(request):
     today_contacts_completed = StudentContact.objects.filter(lead_follow_up = request.user,last_follow_up = date.today()).count()
     rejected_contacts = StudentContact.objects.filter(lead_follow_up = request.user,active = False).count()
     all_contacts = StudentContact.objects.filter(lead_follow_up = request.user,active = True).count()
+    
+
 
 
     context = {

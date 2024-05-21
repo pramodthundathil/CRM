@@ -12,6 +12,13 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from datetime import date, datetime
 from django.contrib.auth.decorators import login_required
 
+
+from xhtml2pdf import pisa
+from datetime import datetime, timedelta
+from django.utils import timezone
+from django.http import HttpResponse
+import csv
+
 # Create your views here.
 
 # all contact tab can view with pagenator no filter for contact 
@@ -521,6 +528,8 @@ def UserWiseData(request):
 
 @login_required(login_url="login")
 def UpdatesOfstaff(request,pk):
+    today = timezone.now()
+    start_date = today + timedelta(days=-1)
     user = User.objects.get(id = pk)
     contact_count = StudentContact.objects.filter(lead_follow_up = user,follow_up_status = "Not Called",active = True ).count()
     new_contact_count = StudentContact.objects.filter(lead_follow_up = user,follow_up_status = "Not Called", next_follow_up = date.today(),active = True ).count()
@@ -528,6 +537,10 @@ def UpdatesOfstaff(request,pk):
     today_follow_up = StudentContact.objects.filter(lead_follow_up = user,next_follow_up = date.today(),active = True).exclude(follow_up_status = "Not Called").count()
     upcomming_contacts_count = StudentContact.objects.filter(lead_follow_up = user,next_follow_up__gt = date.today(),active = True).count()
     today_contacts_completed = StudentContact.objects.filter(lead_follow_up = user,last_follow_up = date.today(),active = True).count()
+    rejected_contacts = StudentContact.objects.filter(lead_follow_up = user, active=False).count()
+    yesterday_contacts = StudentContact.objects.filter(lead_follow_up = user,last_follow_up = start_date ).count()
+    allcontact = StudentContact.objects.filter(lead_follow_up = user).count()
+
 
     context = {
         "contact_count":contact_count,
@@ -536,6 +549,9 @@ def UpdatesOfstaff(request,pk):
         "new_contact_count":new_contact_count,
         "upcomming_contacts_count":upcomming_contacts_count,
         "today_contacts_completed":today_contacts_completed,
+        "rejected_contacts":rejected_contacts,
+        "yesterday_contacts":yesterday_contacts,
+        "allcontact":allcontact,
         "user":user
     }
 
@@ -683,15 +699,89 @@ def CompletedTodayAdmin(request,pk):
 
     return render(request,"leadscompletedtoday.html",context)
 
+def CompletedYesterday(request,pk):
+    this_month = timezone.now().month
+    today = timezone.now()
+    start_date = today + timedelta(days=-1)
+    user1 = User.objects.get(id = pk)
+
+    contacts = StudentContact.objects.filter(lead_follow_up = user1,last_follow_up = start_date )
+
+    p = Paginator(contacts, 30)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)  # returns the desired page object
+    except PageNotAnInteger:
+        # if page_number is not an integer then assign the first page
+        page_obj = p.page(1)
+    except EmptyPage:
+        # if page is empty then return last page
+        page_obj = p.page(p.num_pages)
+    
+    context = {
+        "contacts":page_obj,
+        "contacts_count":len(contacts),
+        "user1":user1,
+        "yesterday":start_date
+    }
+    return render(request,"yesterdayscompletion.html",context)
+
+
+
+def AllCallsAdminview(request,pk):
+    user1 = User.objects.get(id = pk)
+    contacts = StudentContact.objects.filter(lead_follow_up = user1)
+    p = Paginator(contacts, 30)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)  # returns the desired page object
+    except PageNotAnInteger:
+        # if page_number is not an integer then assign the first page
+        page_obj = p.page(1)
+    except EmptyPage:
+        # if page is empty then return last page
+        page_obj = p.page(p.num_pages)
+    
+    context = {
+        "contacts":page_obj,
+        "contacts_count":len(contacts),
+        "user1":user1,
+
+    }
+    return render(request,"allcallsbyuseradminview.html",context)
+
+def RejectedAdminview(request,pk):
+    user1 = User.objects.get(id = pk)
+    contacts = StudentContact.objects.filter(lead_follow_up = user1, active=False)
+    p = Paginator(contacts, 30)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)  # returns the desired page object
+    except PageNotAnInteger:
+        # if page_number is not an integer then assign the first page
+        page_obj = p.page(1)
+    except EmptyPage:
+        # if page is empty then return last page
+        page_obj = p.page(p.num_pages)
+    
+    context = {
+        "contacts":page_obj,
+        "contacts_count":len(contacts),
+        "user1":user1,
+
+    }
+    return render(request,"rejectedcalladminview.html",context)
+
+
+
+
+
+
 
 # report generation for data 
 
 
-from xhtml2pdf import pisa
-from datetime import datetime, timedelta
-from django.utils import timezone
-from django.http import HttpResponse
-import csv
+
 
 this_month = timezone.now().month
 today = timezone.now()
@@ -899,6 +989,10 @@ def SearchBydate(request):
         "contacts":page_obj
     }
     return render(request,"searchresults.html",context)
+
+
+
+
 
 
 

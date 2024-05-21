@@ -106,6 +106,48 @@
                             </div>
                         </div>
 
+                        <div class="col-md-4 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">Completed Yesterday</h4>
+                                    <div class="media">
+                                        <i class="mdi mdi-phone-voip icon-md text-info d-flex align-self-center me-3"></i>
+                                        <div class="media-body">
+                                            <p class="card-text"><span class="h4">{{yesterday_contacts}}</span>  contacts <a href="{%url 'CompletedYesterday' user.id %}" class="btn btn-outline-info btn-sm">View</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">All Ledas Status</h4>
+                                    <div class="media">
+                                        <i class="mdi mdi-phone-voip icon-md text-info d-flex align-self-center me-3"></i>
+                                        <div class="media-body">
+                                            <p class="card-text"><span class="h4">{{allcontact}}</span>  contacts <a href="{%url 'AllCallsAdminview' user.id %}" class="btn btn-outline-info btn-sm">View</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">Rejected Or deleted</h4>
+                                    <div class="media">
+                                        <i class="mdi mdi-phone-voip icon-md text-danger d-flex align-self-center me-3"></i>
+                                        <div class="media-body">
+                                            <p class="card-text"><span class="h4">{{rejected_contacts}}</span>  contacts <a href="{%url 'RejectedAdminview' user.id %}" class="btn btn-outline-info btn-sm">View</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
 
                         
 

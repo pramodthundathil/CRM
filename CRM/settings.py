@@ -89,6 +89,19 @@ DATABASES = {
     }
 }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'betacrm',
+#         'USER': 'betacrm_user',
+#         'PASSWORD': '8zEQV4b2uqryxIjWsLtbkokiHPTaF9MU',
+#         'HOST': '185.38.109.109',
+#         'PORT': '5432',
+#     }
+# }
+
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
