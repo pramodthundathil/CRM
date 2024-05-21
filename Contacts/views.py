@@ -1006,14 +1006,21 @@ def SearchBydateadmin(request):
         if leadstatus == "all":
             if user == "all":
                 contacts = StudentContact.objects.filter(last_follow_up__gte = sdate, last_follow_up__lte = edate, active = True)
+                print("Working Without admin and lead with out ...................................")
             else:
                 contacts = StudentContact.objects.filter(lead_follow_up = user,last_follow_up__gte = sdate, last_follow_up__lte = edate, active = True,)
+                print("Working with admin ...................................")
+
 
         else:
             if user == "all":
                 contacts = StudentContact.objects.filter(last_follow_up__gte = sdate, last_follow_up__lte = edate, follow_up_status = leadstatus )
+                print("Working Without admin and lead all 2 ...................................")
+
             else:
-                contacts = StudentContact.objects.filter(lead_follow_up = user,last_follow_up__gte = sdate, last_follow_up__lte = edate, active = True,)
+                contacts = StudentContact.objects.filter(lead_follow_up = user,last_follow_up__gte = sdate,follow_up_status = leadstatus, last_follow_up__lte = edate, active = True,)
+                print("Working correctly ...................................")
+
 
     p = Paginator(contacts, 30)
     page_number = request.GET.get('page')
