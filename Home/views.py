@@ -12,9 +12,23 @@ from datetime import date, datetime
 from django.contrib.auth.decorators import login_required
 
 # models import 
-
 from .models import CompanyProfile
 from Contacts.models import StudentContact, LeadCallStatus 
+
+from datetime import date, timedelta
+
+def get_current_month_and_year():
+    current_date = date.today()
+    current_month = current_date.strftime("%B")
+    current_year = current_date.year
+
+    return current_month, current_year
+
+# Usage
+month, year = get_current_month_and_year()
+
+
+
 
 class CustomLoginView(LoginView):
     template_name = 'login.html'  # specify your login template
@@ -100,24 +114,224 @@ def Index(request):
         warm_contacts = StudentContact.objects.filter(last_status = "Warm Lead",active = True).count()
         hot_contacts = StudentContact.objects.filter(last_status = "Hot Lead",active = True).count()
         converted_contacts = StudentContact.objects.filter(last_status = "Converted",active = True).count()
-        rejected_contacts = StudentContact.objects.filter(last_status = "Rejected",active = True).count()
+        rejected_contacts = StudentContact.objects.filter(active = False).count()
         pending = StudentContact.objects.filter(next_follow_up = date.today(),active = True).count()
+
+        # lead status summery 
+        notattended = StudentContact.objects.filter(follow_up_status = "Not Called",active = True).count()
+        Intrested = StudentContact.objects.filter(follow_up_status = "Intrested",active = True).count()
+        contacts = StudentContact.objects.filter(follow_up_status = "Intrested",active = True)
     else:
         contacts_count = StudentContact.objects.filter(lead_follow_up = request.user,active = True).count()
         warm_contacts = StudentContact.objects.filter(lead_follow_up = request.user,last_status = "Warm Lead",active = True).count()
         hot_contacts = StudentContact.objects.filter(lead_follow_up = request.user,last_status = "Hot Lead",active = True).count()
         converted_contacts = StudentContact.objects.filter(lead_follow_up = request.user,last_status = "Converted",active = True).count()
-        rejected_contacts = StudentContact.objects.filter(lead_follow_up = request.user,last_status = "Rejected",active = True).count()
+        rejected_contacts = StudentContact.objects.filter(lead_follow_up = request.user,active = False).count()
         pending = StudentContact.objects.filter(lead_follow_up = request.user,next_follow_up__lt = date.today(),active = True).count()
+
+        # lead status summery 
+        notattended = StudentContact.objects.filter(lead_follow_up = request.user,follow_up_status = "Not Called",active = True).count()
+        Intrested = StudentContact.objects.filter(lead_follow_up = request.user,follow_up_status = "Intrested",active = True).count()
+        contacts = StudentContact.objects.filter(lead_follow_up = request.user,follow_up_status = "Intrested",active = True)
+
+
+
+
+
+    # ++++++++++++++++++++++++++ Dash Board Chat components data start +++++++++++++++++++++++++++++++++++++
+    #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    from django.db.models import Count
+    from django.utils import timezone
+    from django.db.models.functions import ExtractWeekDay, TruncMonth
+    from datetime import timedelta 
+    from django.db.models import Q, Count
+
+
+    ############################ Calculations of Performace chart weekly wise start#############################
+    # Get today's date
+    today = timezone.now().date()
+    # Calculate the start and end of the current week
+    start_of_week = today - timedelta(days=today.weekday())  # Monday
+    end_of_week = start_of_week + timedelta(days=6)  # Sunday
+
+    # Calculate the start and end of the previous week
+    start_of_previous_week = start_of_week - timedelta(days=7)
+    end_of_previous_week = end_of_week - timedelta(days=7)
+     
+    contacts_this_week = StudentContact.objects.filter(last_follow_up__range=[start_of_week, end_of_week]).exclude(follow_up_status = "Not Called")
+
+    # Filter StudentContact objects for the previous week, excluding "Not Called"
+    contacts_previous_week = StudentContact.objects.filter(last_follow_up__range=[start_of_previous_week, end_of_previous_week]).exclude(follow_up_status="Not Called")
+
+    # Annotate and count the contacts day-wise
+    day_wise_counts = contacts_this_week.annotate(day_of_week=ExtractWeekDay('last_follow_up')).values('day_of_week').annotate(count=Count('id')).order_by('day_of_week')
+
+    # Annotate and count the contacts day-wise for the previous week
+    day_wise_counts_previous_week = contacts_previous_week.annotate(day_of_week=ExtractWeekDay('last_follow_up')).values('day_of_week').annotate(count=Count('id')).order_by('day_of_week')
+
+
+
+    # Create a dictionary to map day numbers to day names
+    days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    day_wise_counts_dict_previous_week = {day: 0 for day in days}
+
+    day_wise_counts_dict_this_week = {'Sunday':0,'Monday':0,'Tuesday':0,'Wednesday':0,'Thursday':0,'Friday':0,'Saturday':0}
+    # day_wise_counts_dict = {days[entry['day_of_week'] - 1]: entry['count'] for entry in day_wise_counts}
+    for entry in day_wise_counts:
+        day_wise_counts_dict_this_week[days[entry['day_of_week'] - 1]] = entry['count']
+
+    for entry in day_wise_counts_previous_week:
+        day_wise_counts_dict_previous_week[days[entry['day_of_week'] - 1]] = entry['count']
+
+    print(day_wise_counts_dict_this_week,",|--------------------------------------)")
+    day_wise_counts_list_this_week = list(day_wise_counts_dict_this_week.values())
+    print(day_wise_counts_list_this_week)
+    day_wise_counts_list_previous_week = list(day_wise_counts_dict_previous_week.values())
+    print(day_wise_counts_list_previous_week)
+    ############################ Calculations of Performace chart weekly wise end #############################
+
+    ############################ Calculation of donetchart monthly wise start this month #####################################
+    sligtly_interested = StudentContact.objects.filter(follow_up_status = "Sligtly Intrested").count()
+    interested = StudentContact.objects.filter(follow_up_status = "Intrested").count()
+    not_called = StudentContact.objects.filter(follow_up_status = "Not Called").count()
+    rejected = StudentContact.objects.filter(active = False).count()
+
+    donut_list = [sligtly_interested,interested,not_called,rejected]
+    print(donut_list,"-------------------------------")
+    total_sum = sum(donut_list)
+
+    # Calculate the percentage of each value in donut_list
+    donut_list_percentages = [int((value / total_sum) * 100) for value in donut_list]
+    print(donut_list_percentages,"--------'''''''''''''''''''''''''''''''''''''''''''''''''''---------")
+
+
+    ############################ Calculation of donetchart monthly wise end this month #####################################
+    ############################ Calculation of Barchat month calling status start #####################################
+
+    current_date = datetime.now()
+    # Query to get the count of student contacts for each month and year
+    monthly_counts = (
+    StudentContact.objects
+    .exclude(Q(follow_up_status='Intrested') | Q(follow_up_status='Sligtly Intrested') | Q(follow_up_status='Not Called'))
+    .annotate(month=TruncMonth('last_follow_up'))
+    .values('month')
+    .annotate(count=Count('id'))
+    .order_by('month')
+    )
+
+    monthly_counts_interested = (
+    StudentContact.objects
+    .filter(Q(follow_up_status='Intrested') | Q(follow_up_status='Sligtly Intrested'))
+    .annotate(month=TruncMonth('last_follow_up'))
+    .values('month')
+    .annotate(count=Count('id'))
+    .order_by('month')
+    )
+    # monthly_counts = (
+    # StudentContact.objects
+    # .all()
+    # .annotate(month=TruncMonth('last_follow_up'))
+    # .values('month')
+    # .annotate(count=Count('id'))
+    # .order_by('month')
+    # )
+    # print(monthly_counts,"44444444444444444444444444444444444444")
+    # Extract the results into a list
+    monthly_contact_counts = {"JAN":0,"FEB":0, "MAR":0, "APR":0, "MAY":0, "JUN":0, "JUL":0, "AUG":0, "SEP":0, "OCT":0, "NOV":0, "DEC":0}
+    monthly_contact_counts_interested = {"JAN":0,"FEB":0, "MAR":0, "APR":0, "MAY":0, "JUN":0, "JUL":0, "AUG":0, "SEP":0, "OCT":0, "NOV":0, "DEC":0}
+    for entry in monthly_counts:
+        if entry['month'] == None:
+            continue
+        else:
+            monthly_contact_counts[str((entry['month']).strftime("%B")).upper()] = entry["count"]
+
+
+    for entry in monthly_counts_interested:
+        if entry['month'] == None:
+            continue
+        else:
+            monthly_contact_counts_interested[str((entry['month']).strftime("%B")).upper()] = entry["count"]
+
+        # print(str((entry['month']).strftime("%B")).upper(),"00000000000000000000000000000000000000000")
+
+    # print(list(monthly_contact_counts.values()),"88888888888888888888888888888888888888888888888888888888888888888")
+    ongoing = list(monthly_contact_counts.values())
+    interested_contact_count = list(monthly_contact_counts_interested.values())
+    print(interested_contact_count,"oioisadah777777777777777777777777777777777777777777777777777777")
+
+
+    ############################ Calculation of Barchat month calling status end #####################################
+    ############################ Calculation of Performence status Start #####################################
+    """
+    Performence Analyser Createria:
+    Calculate the the total calls of a day (Includes all call data ).
+    also monthly interested and slightly interested data and covertions of leads will be 30% of contribution in the calculation
+    70% point will be from total called data.
+
+    """
+
+    users = User.objects.get(id = 3)
+    # Get the first and last days of the current month
+    current_date = date.today()
+    first_day_of_month = current_date.replace(day=1)
+    last_day_of_month = current_date.replace(day=1, month=current_date.month % 12 + 1) - timedelta(days=1)
+    
+    
+    users_count = (
+    StudentContact.objects
+    .exclude(last_follow_up=None)  # Exclude objects where last_follow_up is None
+    .exclude(follow_up_status='Not Called')
+    .filter(last_follow_up__range=[first_day_of_month, last_day_of_month])  # Filter by last_follow_up within current month
+    .values('lead_follow_up')  # Group by lead_follow_up foreign key
+    .annotate(count=Count('lead_follow_up'))  # Count occurrences of each lead_follow_up
+    )
+    print(User.objects.get(id = users_count[1]["lead_follow_up"]),",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,")
+    # Create a dictionary with foreign key objects as keys and their counts as values
+    foreign_key_count_dict = {}
+    for item in users_count:
+        foreign_key = item['lead_follow_up']
+        count = item['count']
+        foreign_key_object = User.objects.get(id=foreign_key)
+        foreign_key_count_dict[foreign_key_object] = count
+        sorted_foreign_key_count_dict = dict(sorted(foreign_key_count_dict.items(), key=lambda item: item[1], reverse=True))
+
+    print(list(foreign_key_count_dict.keys())[0].first_name)
+    print(sorted_foreign_key_count_dict)
+    
+    
+
+
+    ############################ Calculation of Performence status End #######################################
+
+    
+
+    #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # ++++++++++++++++++++++++++ Dash Board Chat components data end +++++++++++++++++++++++++++++++++++++        
 
     
     context = {
+        "month":month,
+        "year":year,
+        "contacts":contacts[:10],
         "contacts_count":contacts_count,
         "warm_contacts":warm_contacts,
         "hot_contacts":hot_contacts,
         "converted_contacts":converted_contacts,
         "rejected_contacts":rejected_contacts,
-        "pending":pending
+        "pending":pending,
+        "notattended":notattended,
+        "Intrested":Intrested,
+
+        # Chart Values To the templates
+        #$$ for line chart  .....
+        "day_wise_counts_list_this_week":day_wise_counts_list_this_week,
+        "day_wise_counts_list_previous_week":day_wise_counts_list_previous_week,
+        #$$ for donut chat ......
+        "donut_list_percentages":donut_list_percentages,
+        "ongoing":ongoing,
+        "interested_contact_count":interested_contact_count,
+        "performence_data":sorted_foreign_key_count_dict,
+
 
     }
     return render(request,"index.html",context)

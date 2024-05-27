@@ -14,7 +14,7 @@
           labels: ["SUN","sun", "MON", "mon", "TUE","tue", "WED", "wed", "THU", "thu", "FRI", "fri", "SAT"],
           datasets: [{
               label: 'This week',
-              data: [50, 110, 60, 290, 200, 115, 130, 170, 90, 210, 240, 280, 200],
+              data: [500, 110, 60, 290, 200, 115, 130, 170, 90, 210, 240, 280, 200],
               backgroundColor: saleGradientBg,
               borderColor: [
                   '#1F3BB3',
@@ -28,7 +28,7 @@
               pointBorderColor: ['#fff','#fff','#fff','#fff','#fff','#fff','#fff','#fff','#fff','#fff','#fff','#fff','#fff',],
           },{
             label: 'Last week',
-            data: [30, 150, 190, 250, 120, 150, 130, 20, 30, 15, 40, 95, 180],
+            data: [300, 150, 190, 250, 120, 150, 130, 20, 30, 15, 40, 95, 180],
             backgroundColor: saleGradientBg2,
             borderColor: [
                 '#52CDFF',
@@ -554,7 +554,7 @@
       var doughnutChartCanvas = $("#doughnutChart").get(0).getContext("2d");
       var doughnutPieData = {
         datasets: [{
-          data: [40, 20, 30, 10],
+          data: [30, 10, 10, 50],
           backgroundColor: [
             "#1F3BB3",
             "#FDD0C7",
@@ -571,10 +571,10 @@
   
         // These labels appear in the legend and in the tooltips when hovering different arcs
         labels: [
-          'Total',
-          'Net',
-          'Gross',
-          'AVG',
+          'Not Called',
+          'Intrested',
+          'Slightly Intrested',
+          'Rejected',
         ]
       };
       var doughnutPieOptions = {

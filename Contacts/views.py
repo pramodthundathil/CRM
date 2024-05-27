@@ -162,12 +162,14 @@ def ViewContactData(request,pk):
     leadcall_status = LeadCallStatus.objects.filter(contact = contact)[::-1]
     users = User.objects.all()
     dt = date.today()
+    previous_url = request.META.get('HTTP_REFERER', 'Index')
 
     context = {
         "contact":contact,
         "leadcall_status":leadcall_status,
         "users":users,
-        "dt":dt
+        "dt":dt,
+        "previous_url":previous_url
     }
     return render(request,"viewcontactdata.html",context)
 
@@ -391,6 +393,32 @@ def TodaysFollowUp(request):
     }  
 
     return render(request,"todays_follow_up.html",context)
+
+@login_required(login_url="login")
+def InterestedContacts(request):
+    if request.user.groups.all()[0].name == "admin":
+        contacts = StudentContact.objects.filter(follow_up_status = "Intrested",active = True)
+    else:
+        contacts = StudentContact.objects.filter(lead_follow_up = request.user,follow_up_status = "Intrested",active = True)
+
+    p = Paginator(contacts, 30)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)  # returns the desired page object
+    except PageNotAnInteger:
+        # if page_number is not an integer then assign the first page
+        page_obj = p.page(1)
+    except EmptyPage:
+        # if page is empty then return last page
+        page_obj = p.page(p.num_pages)
+    context = {
+    "contacts":page_obj,
+    "contacts_count":len(contacts),
+    "user1":request.user
+
+    
+    } 
+    return render(request,"interestedcontacts.html",context)
 
 @login_required(login_url="login")
 def UpcommingFollowUp(request):
@@ -938,10 +966,12 @@ def AllCallList(request):
 from django.db.models import Q
 @login_required(login_url="login")
 def Search(request):
-    contacts = None
+    global search
+    
     if request.method == "POST":
         search = request.POST['search']
-        contacts = StudentContact.objects.filter(
+
+    contacts = StudentContact.objects.filter(
             Q(name__icontains=search) | Q(collage__icontains=search)
         )
     p = Paginator(contacts, 30)
@@ -956,21 +986,28 @@ def Search(request):
         page_obj = p.page(p.num_pages)
     
     context = {
-        "contacts":page_obj
+        "contacts":page_obj,
+        "contacts_count":len(contacts),
+
     }
     return render(request,"searchresults.html",context)
 
 
 def SearchBydate(request):
+    
+    global sdate
+    global edate
+    global leadstatus
+    global contacts
     contacts = None
     if request.method == "POST":
         sdate = request.POST['sdate']
         edate = request.POST['edate']
         leadstatus = request.POST["leadstatus"]
-        if leadstatus == "all":
-            contacts = StudentContact.objects.filter(last_follow_up__gte = sdate, last_follow_up__lte = edate, active = True)
-        else:
-            contacts = StudentContact.objects.filter(last_follow_up__gte = sdate, last_follow_up__lte = edate, follow_up_status = leadstatus )
+    if leadstatus == "all":
+        contacts = StudentContact.objects.filter(last_follow_up__gte = sdate, last_follow_up__lte = edate, active = True)
+    else:
+        contacts = StudentContact.objects.filter(last_follow_up__gte = sdate, last_follow_up__lte = edate, follow_up_status = leadstatus )
 
 
 
@@ -986,7 +1023,9 @@ def SearchBydate(request):
         page_obj = p.page(p.num_pages)
     
     context = {
-        "contacts":page_obj
+        "contacts":page_obj,
+        "contacts_count":len(contacts),
+
     }
     return render(request,"searchresults.html",context)
 
@@ -994,32 +1033,36 @@ def SearchBydate(request):
 
 def SearchBydateadmin(request):
     contacts = None
+    global sdate
+    global edate
+    global leadstatus
+    global user
     if request.method == "POST":
         sdate = request.POST['sdate']
         edate = request.POST['edate']
         leadstatus = request.POST["leadstatus"]
         user = request.POST['user']
-        try:
-            user = User.objects.get(id = int(user))
-        except:
-            user = "all"
-        if leadstatus == "all":
-            if user == "all":
-                contacts = StudentContact.objects.filter(last_follow_up__gte = sdate, last_follow_up__lte = edate, active = True)
-                print("Working Without admin and lead with out ...................................")
-            else:
-                contacts = StudentContact.objects.filter(lead_follow_up = user,last_follow_up__gte = sdate, last_follow_up__lte = edate, active = True,)
-                print("Working with admin ...................................")
+    try:
+        user = User.objects.get(id = int(user))
+    except:
+        user = "all"
+    if leadstatus == "all":
+        if user == "all":
+            contacts = StudentContact.objects.filter(last_follow_up__gte = sdate, last_follow_up__lte = edate, active = True)
+            print("Working Without admin and lead with out ...................................")
+        else:
+            contacts = StudentContact.objects.filter(lead_follow_up = user,last_follow_up__gte = sdate, last_follow_up__lte = edate, active = True,)
+            print("Working with admin ...................................")
 
+
+    else:
+        if user == "all":
+            contacts = StudentContact.objects.filter(last_follow_up__gte = sdate, last_follow_up__lte = edate, follow_up_status = leadstatus )
+            print("Working Without admin and lead all 2 ...................................")
 
         else:
-            if user == "all":
-                contacts = StudentContact.objects.filter(last_follow_up__gte = sdate, last_follow_up__lte = edate, follow_up_status = leadstatus )
-                print("Working Without admin and lead all 2 ...................................")
-
-            else:
-                contacts = StudentContact.objects.filter(lead_follow_up = user,last_follow_up__gte = sdate,follow_up_status = leadstatus, last_follow_up__lte = edate, active = True,)
-                print("Working correctly ...................................")
+            contacts = StudentContact.objects.filter(lead_follow_up = user,last_follow_up__gte = sdate,follow_up_status = leadstatus, last_follow_up__lte = edate, active = True,)
+            print("Working correctly ...................................")
 
 
     p = Paginator(contacts, 30)
@@ -1034,9 +1077,14 @@ def SearchBydateadmin(request):
         page_obj = p.page(p.num_pages)
     
     context = {
-        "contacts":page_obj
+        "contacts":page_obj,
+        "contacts_count":len(contacts),
+
     }
     return render(request,"searchresults.html",context)
+
+
+
 
 
 

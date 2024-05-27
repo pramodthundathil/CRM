@@ -41,7 +41,6 @@
 
   .pagenator {
     text-align: center;
-    overflow: auto;
   }
 </style>
 
@@ -54,7 +53,8 @@
         <div class="card-body">
           <div class="d-sm-flex justify-content-between align-items-start">
             <div>
-              <h4 class="card-title card-title-dash">Serach Results <span class="text-small">({{contacts_count}} Contacts)</span> </h4>
+              <h4 class="card-title card-title-dash">Interested Contacts<span class="text-primary">{{user1.first_name}}</span>  <span class="text-small">({{contacts_count}} Contacts)</span> </h4>
+              <a href="{%url 'Index' %}" class="nav-link"><h4 class="text-info d-flex align-items-center"><i class="mdi mdi-arrow-left-bold-circle-outline icon-md text-info  align-self-center"></i> Back To Dashboard</h4></a>
               {% for message in messages %}
               <div class="message {{message.tags}}">
                 <p class="card-subtitle card-subtitle-dash {{message.tags}}">{{message}}</p>
@@ -108,27 +108,27 @@
                     <div class="form-check form-check-flat mt-0">
                       <label class="form-check-label">
                         <input type="checkbox" class="form-check-input" aria-checked="false"><i
-                          class="input-helper"></i></label>{{forloop.counter0|add:contacts.start_index }}
+                          class="input-helper"></i></label>
                     </div>
                   </th>
                   <th>Customer</th>
                   <th>Streem</th>
+                  <th>Date added</th>
                   <th>Last Updated</th>
-                  <th>Next Follow Up Date</th>
                   <th>No.Of Follow Up</th>
                   <th>Status</th>
                   <th>View</th>
                 </tr>
               </thead>
               <tbody>
-                {% for contact in contacts %}
+                {% for contact in contacts%}
                 <a href="#">
                   <tr>
                     <td>
                       <div class="form-check form-check-flat mt-0">
                         <label class="form-check-label">
                           <input type="checkbox" class="form-check-input" aria-checked="false"><i
-                            class="input-helper"></i></label>
+                            class="input-helper"></i></label>{{forloop.counter0|add:contacts.start_index }}
                       </div>
                     </td>
                     <td>
@@ -144,13 +144,12 @@
                       <h6>{{contact.study_streem}}</h6>
                       <p>collage: {{contact.collage}}</p>
                     </td>
-                    
+                    <td>
+                      {{contact.added_date}}
+                    </td>
                     <td>
                       {{contact.last_follow_up}}
                     </td>
-                    <th class="text-danger">
-                        {{contact.next_follow_up}}
-                      </th>
                     <td>
                       {{contact.number_follow_up}}
                     </td>
@@ -158,7 +157,7 @@
                       <div class="badge badge-opacity-warning">{{contact.follow_up_status}}</div>
                     </td>
                     <td>
-                      <a href="{%url 'ViewContactData' contact.id %}" class="btn btn-outline-dark btn-sm">View</a>
+                      <a href="{%url 'ViewContactData' contact.id %}"  class="btn btn-outline-dark btn-sm">View</a>
                     </td>
                   </tr>
                 </a>
@@ -200,6 +199,72 @@
     <!--/ Basic Pagination -->
   </div>
 </div>
+<!-- Modal -->
+<div class="modal fade" id="basicModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel1">Add New Contact</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST">
+          {% csrf_token %}
 
+          <div class="row g-2">
+            {% for field in form %}
+            <div class="col-md-6 mb-0">
+              <label class="form-label">{{field.label}}</label>
+              {{field}}
+            </div>
+            {% endfor %}
+
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+        <button type="submit" onclick="return confirm('Confirm To add contact to database ?')"
+          class="btn btn-primary">Save changes</button>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal 2 -->
+<div class="modal fade" id="modalCenter" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalCenterTitle">Upload Excel</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <form action="{%url 'import_data_from_excel' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="col mb-3">
+              <label for="nameWithTitle" class="form-label">Upload Excel Sheet To Create Database</label>
+              <input type="file" id="nameWithTitle" class="form-control" name="excel_file" /> <br><br>
+              <button type="submit" class="btn btn-primary">Upload File</button>
+
+            </div>
+        </div>
+        </form>
+
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
 {% endblock %}

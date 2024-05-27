@@ -42,6 +42,8 @@ urlpatterns = [
     path("DeleteContacts",views.DeleteContacts,name="DeleteContacts"),
     path("AllCallList",views.AllCallList,name="AllCallList"),
     path("RejectedCallList",views.RejectedCallList,name="RejectedCallList"),
+    path("InterestedContacts",views.InterestedContacts,name="InterestedContacts"),
+    
   
   
 ]  

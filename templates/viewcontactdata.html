@@ -17,6 +17,8 @@
               <h4 class="card-title card-title-dash">Contact - {{contact}} </h4>
               <h2>Phone: <span class="text-danger">{{contact.contact_number}}</span> <a
                   href="tel:{{contact.contact_number}}" class="btn btn-outline-primary btn-sm">Call</a></h2>
+              <a href="{{previous_url}}" class="nav-link"><h4 class="text-info d-flex align-items-center"><i class="mdi mdi-arrow-left-bold-circle-outline icon-md text-info  align-self-center"></i> Back To Leads</h4></a>
+
               {% for message in messages %}
               <div class="message {{message.tags}}">
                 <p class="card-subtitle card-subtitle-dash {{message.tags}}">{{message}}</p>
@@ -256,9 +258,9 @@
                       <option value="Normal">Normal</option>
                       <option value="RNR">RNR</option>
                       <option value="Not Taken">Not Taken</option>
-                      <option value="Not intrested">Not intrested</option>
-                      <option value="Intrested">Intrested</option>
-                      <option value="Sligtly Intrested">Sligtly Intrested</option>
+                      <option value="Not intrested">Not interested</option>
+                      <option value="Intrested">Interested</option>
+                      <option value="Sligtly Intrested">Slightly Interested</option>
                       <option value="Call Back">Call Back</option>
                       
                     </select>
