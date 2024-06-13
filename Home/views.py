@@ -30,8 +30,8 @@ month, year = get_current_month_and_year()
 
 
 
-class CustomLoginView(LoginView):
-    template_name = 'login.html'  # specify your login template
+# class CustomLoginView(LoginView):
+#     template_name = 'login.html'  # specify your login template
 
 # # Create your views here.
 # @unautenticated_user
@@ -111,9 +111,9 @@ class CustomLoginView(LoginView):
 def Index(request):
     if request.user.groups.all()[0].name == "admin":
         contacts_count = StudentContact.objects.filter(active = True).count()
-        warm_contacts = StudentContact.objects.filter(last_status = "Warm Lead",active = True).count()
-        hot_contacts = StudentContact.objects.filter(last_status = "Hot Lead",active = True).count()
-        converted_contacts = StudentContact.objects.filter(last_status = "Converted",active = True).count()
+        warm_contacts = StudentContact.objects.filter(lead_status = "Warm Lead",active = True).count()
+        hot_contacts = StudentContact.objects.filter(lead_status = "Hot Lead",active = True).count()
+        converted_contacts = StudentContact.objects.filter(lead_status = "Converted",active = True).count()
         rejected_contacts = StudentContact.objects.filter(active = False).count()
         pending = StudentContact.objects.filter(next_follow_up = date.today(),active = True).count()
 
@@ -125,7 +125,8 @@ def Index(request):
         contacts_count = StudentContact.objects.filter(lead_follow_up = request.user,active = True).count()
         warm_contacts = StudentContact.objects.filter(lead_follow_up = request.user,last_status = "Warm Lead",active = True).count()
         hot_contacts = StudentContact.objects.filter(lead_follow_up = request.user,last_status = "Hot Lead",active = True).count()
-        converted_contacts = StudentContact.objects.filter(lead_follow_up = request.user,last_status = "Converted",active = True).count()
+        converted_contacts = StudentContact.objects.filter(lead_status ='Converted').count()
+        
         rejected_contacts = StudentContact.objects.filter(lead_follow_up = request.user,active = False).count()
         pending = StudentContact.objects.filter(lead_follow_up = request.user,next_follow_up__lt = date.today(),active = True).count()
 
@@ -217,7 +218,7 @@ def Index(request):
     .values('month')
     .annotate(count=Count('id'))
     .order_by('month')
-    )
+)
 
     monthly_counts_interested = (
     StudentContact.objects
@@ -226,7 +227,7 @@ def Index(request):
     .values('month')
     .annotate(count=Count('id'))
     .order_by('month')
-    )
+)
     # monthly_counts = (
     # StudentContact.objects
     # .all()
@@ -237,8 +238,8 @@ def Index(request):
     # )
     # print(monthly_counts,"44444444444444444444444444444444444444")
     # Extract the results into a list
-    monthly_contact_counts = {"JAN":0,"FEB":0, "MAR":0, "APR":0, "MAY":0, "JUN":0, "JUL":0, "AUG":0, "SEP":0, "OCT":0, "NOV":0, "DEC":0}
-    monthly_contact_counts_interested = {"JAN":0,"FEB":0, "MAR":0, "APR":0, "MAY":0, "JUN":0, "JUL":0, "AUG":0, "SEP":0, "OCT":0, "NOV":0, "DEC":0}
+    monthly_contact_counts = {"JAN":0,"FEB":0, "MAR":0, "APR":0, "MAY":0, "JUNE":0, "JUL":0, "AUG":0, "SEP":0, "OCT":0, "NOV":0, "DEC":0}
+    monthly_contact_counts_interested = {"JAN":0,"FEB":0, "MAR":0, "APR":0, "MAY":0, "JUNE":0, "JUL":0, "AUG":0, "SEP":0, "OCT":0, "NOV":0, "DEC":0}
     for entry in monthly_counts:
         if entry['month'] == None:
             continue
@@ -254,10 +255,10 @@ def Index(request):
 
         # print(str((entry['month']).strftime("%B")).upper(),"00000000000000000000000000000000000000000")
 
-    # print(list(monthly_contact_counts.values()),"88888888888888888888888888888888888888888888888888888888888888888")
+    # print(monthly_contact_counts,"88888888888888888888888888888888888888888888888888888888888888888")
     ongoing = list(monthly_contact_counts.values())
     interested_contact_count = list(monthly_contact_counts_interested.values())
-    print(interested_contact_count,"oioisadah777777777777777777777777777777777777777777777777777777")
+    # print(interested_contact_count,"oioisadah777777777777777777777777777777777777777777777777777777")
 
 
     ############################ Calculation of Barchat month calling status end #####################################
@@ -285,7 +286,7 @@ def Index(request):
     .values('lead_follow_up')  # Group by lead_follow_up foreign key
     .annotate(count=Count('lead_follow_up'))  # Count occurrences of each lead_follow_up
     )
-    print(User.objects.get(id = users_count[1]["lead_follow_up"]),",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,")
+    # print(User.objects.get(id = users_count[1]["lead_follow_up"]),",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,")
     # Create a dictionary with foreign key objects as keys and their counts as values
     foreign_key_count_dict = {}
     for item in users_count:
@@ -297,6 +298,10 @@ def Index(request):
 
     print(list(foreign_key_count_dict.keys())[0].first_name)
     print(sorted_foreign_key_count_dict)
+
+    rankwisedict = sorted_foreign_key_count_dict
+
+    print((sorted_foreign_key_count_dict.keys()))
     
     
 
@@ -306,8 +311,11 @@ def Index(request):
     
 
     #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    # ++++++++++++++++++++++++++ Dash Board Chat components data end +++++++++++++++++++++++++++++++++++++        
-
+    # ++++++++++++++++++++++++++ Dash Board Chat components data end +++++++++++++++++++++++++++++++++++++
+    # 
+    # 
+    
+    
     
     context = {
         "month":month,
@@ -330,7 +338,8 @@ def Index(request):
         "donut_list_percentages":donut_list_percentages,
         "ongoing":ongoing,
         "interested_contact_count":interested_contact_count,
-        "performence_data":sorted_foreign_key_count_dict,
+        "performence_data":rankwisedict,
+
 
 
     }

@@ -417,7 +417,7 @@
                 <li class="nav-item"><a class="nav-link text-warning" href="">Wram Leads</a></li>
                 <li class="nav-item"><a class="nav-link text-danger" href="">Hot Leads</a></li>
                 <li class="nav-item"><a class="nav-link" href="{%url 'PendingContacts' %}">Pending</a></li>
-                <li class="nav-item"><a class="nav-link" href="">Converted</a></li>
+                <li class="nav-item"><a class="nav-link" href="{%url 'ConvertedLeads' %}">Converted</a></li>
                 <li class="nav-item"><a class="nav-link" href="">Rejected</a></li>
 
 
@@ -1730,7 +1730,7 @@
               return data['labels'][tooltipItem[0]['index']];
             },
             label: function(tooltipItem, data) {
-              return data['datasets'][0]['data'][tooltipItem['index']];
+              return data['datasets'][0]['data'][tooltipItem['index'] ]+ ' %';
             }
           },
             

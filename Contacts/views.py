@@ -374,7 +374,7 @@ def PendingTocall(request):
 
 @login_required(login_url="login")
 def TodaysFollowUp(request):
-    contacts = StudentContact.objects.filter(lead_follow_up = request.user,next_follow_up = date.today(),active = True).exclude(follow_up_status = "Not Called")
+    contacts = StudentContact.objects.filter(lead_follow_up = request.user,next_follow_up = date.today()).exclude(follow_up_status = "Not Called")
     p = Paginator(contacts, 30)
     page_number = request.GET.get('page')
     try:
@@ -500,7 +500,10 @@ def HotLeadsUser(request):
 
 @login_required(login_url="login")
 def ConvertedLeads(request):
-    contacts = StudentContact.objects.filter(lead_follow_up = request.user,lead_status ='Converted',active = True)
+    if request.user.groups.all()[0].name == 'admin':
+        contacts = StudentContact.objects.filter(lead_status ='Converted',active = True)
+    else:
+        contacts = StudentContact.objects.filter(lead_follow_up = request.user,lead_status ='Converted',active = True)
     p = Paginator(contacts, 30)
     page_number = request.GET.get('page')
     try:
@@ -856,7 +859,7 @@ def MyReportTodaysFollowUp(request):
     response = HttpResponse(content_type = 'text/csv')
     response['Content-Disposition'] = 'attachment; filename=Callreporton-{}-{}.csv'.format(request.user.first_name,dt.today())
     
-    STUDENT = StudentContact.objects.filter(lead_follow_up = request.user,last_follow_up = dt.today(),active = True)
+    STUDENT = StudentContact.objects.filter(lead_follow_up = request.user,last_follow_up = dt.today())
     def generate_serial_number():
         current_time = datetime.now()
         serial_number = current_time.strftime("%Y%m%d%H%M%S")
