@@ -565,9 +565,9 @@ def UpdatesOfstaff(request,pk):
     contact_count = StudentContact.objects.filter(lead_follow_up = user,follow_up_status = "Not Called",active = True ).count()
     new_contact_count = StudentContact.objects.filter(lead_follow_up = user,follow_up_status = "Not Called", next_follow_up = date.today(),active = True ).count()
     penidng_call_list = StudentContact.objects.filter(lead_follow_up = user,next_follow_up__lt = date.today(),active = True).count()
-    today_follow_up = StudentContact.objects.filter(lead_follow_up = user,next_follow_up = date.today(),active = True).exclude(follow_up_status = "Not Called").count()
+    today_follow_up = StudentContact.objects.filter(lead_follow_up = user,next_follow_up = date.today()).exclude(follow_up_status = "Not Called").count()
     upcomming_contacts_count = StudentContact.objects.filter(lead_follow_up = user,next_follow_up__gt = date.today(),active = True).count()
-    today_contacts_completed = StudentContact.objects.filter(lead_follow_up = user,last_follow_up = date.today(),active = True).count()
+    today_contacts_completed = StudentContact.objects.filter(lead_follow_up = user,last_follow_up = date.today()).count()
     rejected_contacts = StudentContact.objects.filter(lead_follow_up = user, active=False).count()
     yesterday_contacts = StudentContact.objects.filter(lead_follow_up = user,last_follow_up = start_date ).count()
     allcontact = StudentContact.objects.filter(lead_follow_up = user).count()
@@ -1008,7 +1008,7 @@ def SearchBydate(request):
         edate = request.POST['edate']
         leadstatus = request.POST["leadstatus"]
     if leadstatus == "all":
-        contacts = StudentContact.objects.filter(last_follow_up__gte = sdate, last_follow_up__lte = edate, active = True)
+        contacts = StudentContact.objects.filter(last_follow_up__gte = sdate, last_follow_up__lte = edate)
     else:
         contacts = StudentContact.objects.filter(last_follow_up__gte = sdate, last_follow_up__lte = edate, follow_up_status = leadstatus )
 
@@ -1051,10 +1051,10 @@ def SearchBydateadmin(request):
         user = "all"
     if leadstatus == "all":
         if user == "all":
-            contacts = StudentContact.objects.filter(last_follow_up__gte = sdate, last_follow_up__lte = edate, active = True)
+            contacts = StudentContact.objects.filter(last_follow_up__gte = sdate, last_follow_up__lte = edate)
             print("Working Without admin and lead with out ...................................")
         else:
-            contacts = StudentContact.objects.filter(lead_follow_up = user,last_follow_up__gte = sdate, last_follow_up__lte = edate, active = True,)
+            contacts = StudentContact.objects.filter(lead_follow_up = user,last_follow_up__gte = sdate, last_follow_up__lte = edate)
             print("Working with admin ...................................")
 
 
@@ -1064,7 +1064,7 @@ def SearchBydateadmin(request):
             print("Working Without admin and lead all 2 ...................................")
 
         else:
-            contacts = StudentContact.objects.filter(lead_follow_up = user,last_follow_up__gte = sdate,follow_up_status = leadstatus, last_follow_up__lte = edate, active = True,)
+            contacts = StudentContact.objects.filter(lead_follow_up = user,last_follow_up__gte = sdate,follow_up_status = leadstatus, last_follow_up__lte = edate)
             print("Working correctly ...................................")
 
 
