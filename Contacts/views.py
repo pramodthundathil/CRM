@@ -804,15 +804,7 @@ def RejectedAdminview(request,pk):
     return render(request,"rejectedcalladminview.html",context)
 
 
-
-
-
-
-
 # report generation for data 
-
-
-
 
 this_month = timezone.now().month
 today = timezone.now()

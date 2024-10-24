@@ -77,24 +77,66 @@
                 <!-- Basic Pagination -->
                 <nav aria-label="Page navigation">
                   <ul class="pagination">
-                    {%if contacts.has_previous %} {# whether the previous page exists #}
-                    <li class="page-item prev">
-                      <a class="page-link" href="?page={{contacts.previous_page_number}}"><i
-                          class="mdi mdi mdi-chevron-left"></i></a>
+                      {% if contacts.has_previous %} {# whether the previous page exists #}
+                      <li class="page-item prev">
+                          <a class="page-link" href="?page={{ contacts.previous_page_number }}">
+                              <i class="mdi mdi-chevron-left"></i>
+                          </a>
+                      </li>
                       {% endif %}
-                    </li>
-                    {% for page_num in contacts.paginator.page_range %}
-                    <li class="page-item {% if page_num == contacts.number %}active{% endif %}">
-                        <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
-                    </li>
-                    {% endfor %}
-                    {%if contacts.has_next %} {# whether the next page exists #}
-                    <li class="page-item last">
-                      <a class="page-link" href="?page={{contacts.next_page_number}}"><i class="mdi mdi mdi-chevron-right"></i></a>
-                    </li>
-                    {% endif %}
+              
+                      {# Show first 4 pages #}
+                      {% for page_num in contacts.paginator.page_range %}
+                          {% if page_num <= 4 %}
+                              <li class="page-item {% if page_num == contacts.number %}active{% endif %}">
+                                  <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                              </li>
+                          {% endif %}
+                      {% endfor %}
+              
+                      {# Show ellipsis if needed #}
+                      {% if contacts.number > 6 %}
+                          <li class="page-item">
+                              <span class="page-link">...</span>
+                          </li>
+                      {% endif %}
+              
+                      {# Show 2 pages before and after current page if they are not in the first 4 or last 4 pages #}
+                      {% for page_num in contacts.paginator.page_range %}
+                          {% if page_num >= contacts.number|add:-2 and page_num <= contacts.number|add:2 and page_num > 4 and page_num < contacts.paginator.num_pages|add:-3 %}
+                              <li class="page-item {% if page_num == contacts.number %}active{% endif %}">
+                                  <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                              </li>
+                          {% endif %}
+                      {% endfor %}
+              
+                      {# Show ellipsis if needed #}
+                      {% if contacts.number < contacts.paginator.num_pages|add:-5 %}
+                          <li class="page-item">
+                              <span class="page-link">...</span>
+                          </li>
+                      {% endif %}
+              
+                      {# Show last 4 pages #}
+                      {% for page_num in contacts.paginator.page_range %}
+                          {% if page_num > contacts.paginator.num_pages|add:-4 %}
+                              <li class="page-item {% if page_num == contacts.number %}active{% endif %}">
+                                  <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                              </li>
+                          {% endif %}
+                      {% endfor %}
+              
+                      {% if contacts.has_next %} {# whether the next page exists #}
+                      <li class="page-item next">
+                          <a class="page-link" href="?page={{ contacts.next_page_number }}">
+                              <i class="mdi mdi-chevron-right"></i>
+                          </a>
+                      </li>
+                      {% endif %}
                   </ul>
-                </nav>
+              </nav>
+              
+              
                 <!--/ Basic Pagination -->
               </div>
             </div>
@@ -181,24 +223,66 @@
     <!-- Basic Pagination -->
     <nav aria-label="Page navigation">
       <ul class="pagination">
-        {%if contacts.has_previous %} {# whether the previous page exists #}
-        <li class="page-item prev">
-          <a class="page-link" href="?page={{contacts.previous_page_number}}"><i
-              class="mdi mdi mdi-chevron-left"></i></a>
+          {% if contacts.has_previous %} {# whether the previous page exists #}
+          <li class="page-item prev">
+              <a class="page-link" href="?page={{ contacts.previous_page_number }}">
+                  <i class="mdi mdi-chevron-left"></i>
+              </a>
+          </li>
           {% endif %}
-        </li>
-        {% for page_num in contacts.paginator.page_range %}
-        <li class="page-item {% if page_num == contacts.number %}active{% endif %}">
-            <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
-        </li>
-        {% endfor %}
-        {%if contacts.has_next %} {# whether the next page exists #}
-        <li class="page-item last">
-          <a class="page-link" href="?page={{contacts.next_page_number}}"><i class="mdi mdi mdi-chevron-right"></i></a>
-        </li>
-        {% endif %}
+  
+          {# Show first 4 pages #}
+          {% for page_num in contacts.paginator.page_range %}
+              {% if page_num <= 4 %}
+                  <li class="page-item {% if page_num == contacts.number %}active{% endif %}">
+                      <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                  </li>
+              {% endif %}
+          {% endfor %}
+  
+          {# Show ellipsis if needed #}
+          {% if contacts.number > 6 %}
+              <li class="page-item">
+                  <span class="page-link">...</span>
+              </li>
+          {% endif %}
+  
+          {# Show 2 pages before and after current page if they are not in the first 4 or last 4 pages #}
+          {% for page_num in contacts.paginator.page_range %}
+              {% if page_num >= contacts.number|add:-2 and page_num <= contacts.number|add:2 and page_num > 4 and page_num < contacts.paginator.num_pages|add:-3 %}
+                  <li class="page-item {% if page_num == contacts.number %}active{% endif %}">
+                      <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                  </li>
+              {% endif %}
+          {% endfor %}
+  
+          {# Show ellipsis if needed #}
+          {% if contacts.number < contacts.paginator.num_pages|add:-5 %}
+              <li class="page-item">
+                  <span class="page-link">...</span>
+              </li>
+          {% endif %}
+  
+          {# Show last 4 pages #}
+          {% for page_num in contacts.paginator.page_range %}
+              {% if page_num > contacts.paginator.num_pages|add:-4 %}
+                  <li class="page-item {% if page_num == contacts.number %}active{% endif %}">
+                      <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                  </li>
+              {% endif %}
+          {% endfor %}
+  
+          {% if contacts.has_next %} {# whether the next page exists #}
+          <li class="page-item next">
+              <a class="page-link" href="?page={{ contacts.next_page_number }}">
+                  <i class="mdi mdi-chevron-right"></i>
+              </a>
+          </li>
+          {% endif %}
       </ul>
-    </nav>
+  </nav>
+  
+  
     <!--/ Basic Pagination -->
   </div>
 </div>

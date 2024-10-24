@@ -2,7 +2,7 @@
 {% load static %}
 {% block content %}
 <link rel="stylesheet" href="https://cdn.datatables.net/2.0.6/css/dataTables.dataTables.css" />
-  
+
 <script src="https://cdn.datatables.net/2.0.6/js/dataTables.js"></script>
 <style>
   textarea {
@@ -56,7 +56,8 @@
         <div class="card-body">
           <div class="d-sm-flex justify-content-between align-items-start">
             <div>
-              <h4 class="card-title card-title-dash">assign Contacts  <span class="text-small">({{contacts_count}} Contacts)</span></h4>
+              <h4 class="card-title card-title-dash">assign Contacts <span class="text-small">({{contacts_count}}
+                  Contacts)</span></h4>
               {% for message in messages %}
               <div class="message {{message.tags}}">
                 <p class="card-subtitle card-subtitle-dash {{message.tags}}">{{message}}</p>
@@ -65,33 +66,33 @@
               {% endfor %}
             </div>
             <form method="post">
-                {% csrf_token %}
-            <div class="row mb-3">
+              {% csrf_token %}
+              <div class="row mb-3">
                 <div class="col-md-4">
-                    <label for="">Follow Up Date:</label><br>
-                    <input type="date" id="dateInput" name="date" class="form-control" required>
+                  <label for="">Follow Up Date:</label><br>
+                  <input type="date" id="dateInput" name="date" class="form-control" required>
                 </div>
                 <div class="col-md-4">
-                    <label for="">Select Staff:</label><br>
-                    <select name="user" id="" class="form-control" required>
-                        <option value="" selected disabled>----------------------------</option>
-                        {% for i in users %}
-                        {% if i.groups.all.0.name == "sadmin" or i.groups.all.0.name == "staff" %}
-                        <option value="{{i.id}}">{{i.first_name}}</option>
+                  <label for="">Select Staff:</label><br>
+                  <select name="user" id="" class="form-control" required>
+                    <option value="" selected disabled>----------------------------</option>
+                    {% for i in users %}
+                    {% if i.groups.all.0.name == "sadmin" or i.groups.all.0.name == "staff" %}
+                    <option value="{{i.id}}">{{i.first_name}}</option>
 
-                        {% endif %}
-                        {% endfor %}
-                      </select>
+                    {% endif %}
+                    {% endfor %}
+                  </select>
                 </div>
                 <div class="col-md-4">
-                    <button class="btn btn-primary text-white " type="submit" data-bs-toggle="modal"
-                data-bs-target="#basicModal"><i class="mdi mdi-account-plus"></i> Sigin To Staff</button>
+                  <button class="btn btn-primary text-white " type="submit" data-bs-toggle="modal"
+                    data-bs-target="#basicModal"><i class="mdi mdi-account-plus"></i> Sigin To Staff</button>
                 </div>
-                
-                  
-              
-              
-            </div>
+
+
+
+
+              </div>
           </div>
           <div class="table-responsive  mt-1">
             <div class="container pagenator" style="display: flex;justify-content: center;">
@@ -101,28 +102,69 @@
                 <!-- Basic Pagination -->
                 <nav aria-label="Page navigation">
                   <ul class="pagination">
-                    {%if contacts.has_previous %} {# whether the previous page exists #}
+                    {% if contacts.has_previous %} {# whether the previous page exists #}
                     <li class="page-item prev">
-                      <a class="page-link" href="?page={{contacts.previous_page_number}}"><i
-                          class="mdi mdi mdi-chevron-left"></i></a>
-                      {% endif %}
-                    </li>
-                    {% for page_num in contacts.paginator.page_range %}
-                    <li class="page-item {% if page_num == contacts.number %}active{% endif %}">
-                        <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
-                    </li>
-                    {% endfor %}
-                    {%if contacts.has_next %} {# whether the next page exists #}
-                    <li class="page-item last">
-                      <a class="page-link" href="?page={{contacts.next_page_number}}"><i class="mdi mdi mdi-chevron-right"></i></a>
+                      <a class="page-link" href="?page={{ contacts.previous_page_number }}">
+                        <i class="mdi mdi-chevron-left"></i>
+                      </a>
                     </li>
                     {% endif %}
+
+                    {# Show first 4 pages #}
+                    {% for page_num in contacts.paginator.page_range %}
+                    {% if page_num <= 4 %} <li class="page-item {% if page_num == contacts.number %}active{% endif %}">
+                      <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                      </li>
+                      {% endif %}
+                      {% endfor %}
+
+                      {# Show ellipsis if needed #}
+                      {% if contacts.number > 6 %}
+                      <li class="page-item">
+                        <span class="page-link">...</span>
+                      </li>
+                      {% endif %}
+
+                      {# Show 2 pages before and after current page if they are not in the first 4 or last 4 pages #}
+                      {% for page_num in contacts.paginator.page_range %}
+                      {% if page_num >= contacts.number|add:-2 and page_num <= contacts.number|add:2 and page_num> 4 and
+                        page_num < contacts.paginator.num_pages|add:-3 %} <li
+                          class="page-item {% if page_num == contacts.number %}active{% endif %}">
+                          <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                          </li>
+                          {% endif %}
+                          {% endfor %}
+
+                          {# Show ellipsis if needed #}
+                          {% if contacts.number < contacts.paginator.num_pages|add:-5 %} <li class="page-item">
+                            <span class="page-link">...</span>
+                            </li>
+                            {% endif %}
+
+                            {# Show last 4 pages #}
+                            {% for page_num in contacts.paginator.page_range %}
+                            {% if page_num > contacts.paginator.num_pages|add:-4 %}
+                            <li class="page-item {% if page_num == contacts.number %}active{% endif %}">
+                              <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                            </li>
+                            {% endif %}
+                            {% endfor %}
+
+                            {% if contacts.has_next %} {# whether the next page exists #}
+                            <li class="page-item next">
+                              <a class="page-link" href="?page={{ contacts.next_page_number }}">
+                                <i class="mdi mdi-chevron-right"></i>
+                              </a>
+                            </li>
+                            {% endif %}
                   </ul>
                 </nav>
+
+
                 <!--/ Basic Pagination -->
               </div>
             </div>
-            <table class="table select-table" >
+            <table class="table select-table">
               <thead>
                 <tr>
                   <th>
@@ -148,13 +190,13 @@
                   <tr>
                     <td>
                       <div class="form-check form-check-flat mt-0">
-                        
+
                         <label class="form-check-label">
-                          <input type="checkbox" class="form-check-input contact-checkbox" value="{{contact.id}}" name="contact_id" aria-checked="false"><i
-                            class="input-helper"></i></label>
+                          <input type="checkbox" class="form-check-input contact-checkbox" value="{{contact.id}}"
+                            name="contact_id" aria-checked="false"><i class="input-helper"></i></label>
                       </div>
                     </td>
-                   
+
                     <th> {{forloop.counter0|add:contacts.start_index }}</th>
                     <td>
                       <div class="d-flex ">
@@ -204,56 +246,96 @@
     <!-- Basic Pagination -->
     <nav aria-label="Page navigation">
       <ul class="pagination">
-        {%if contacts.has_previous %} {# whether the previous page exists #}
+        {% if contacts.has_previous %} {# whether the previous page exists #}
         <li class="page-item prev">
-          <a class="page-link" href="?page={{contacts.previous_page_number}}"><i
-              class="mdi mdi mdi-chevron-left"></i></a>
-          {% endif %}
-        </li>
-        {% for page_num in contacts.paginator.page_range %}
-        <li class="page-item {% if page_num == contacts.number %}active{% endif %}">
-            <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
-        </li>
-        {% endfor %}
-        {%if contacts.has_next %} {# whether the next page exists #}
-        <li class="page-item last">
-          <a class="page-link" href="?page={{contacts.next_page_number}}"><i class="mdi mdi mdi-chevron-right"></i></a>
+          <a class="page-link" href="?page={{ contacts.previous_page_number }}">
+            <i class="mdi mdi-chevron-left"></i>
+          </a>
         </li>
         {% endif %}
+
+        {# Show first 4 pages #}
+        {% for page_num in contacts.paginator.page_range %}
+        {% if page_num <= 4 %} <li class="page-item {% if page_num == contacts.number %}active{% endif %}">
+          <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+          </li>
+          {% endif %}
+          {% endfor %}
+
+          {# Show ellipsis if needed #}
+          {% if contacts.number > 6 %}
+          <li class="page-item">
+            <span class="page-link">...</span>
+          </li>
+          {% endif %}
+
+          {# Show 2 pages before and after current page if they are not in the first 4 or last 4 pages #}
+          {% for page_num in contacts.paginator.page_range %}
+          {% if page_num >= contacts.number|add:-2 and page_num <= contacts.number|add:2 and page_num> 4 and page_num <
+              contacts.paginator.num_pages|add:-3 %} <li
+              class="page-item {% if page_num == contacts.number %}active{% endif %}">
+              <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+              </li>
+              {% endif %}
+              {% endfor %}
+
+              {# Show ellipsis if needed #}
+              {% if contacts.number < contacts.paginator.num_pages|add:-5 %} <li class="page-item">
+                <span class="page-link">...</span>
+                </li>
+                {% endif %}
+
+                {# Show last 4 pages #}
+                {% for page_num in contacts.paginator.page_range %}
+                {% if page_num > contacts.paginator.num_pages|add:-4 %}
+                <li class="page-item {% if page_num == contacts.number %}active{% endif %}">
+                  <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                </li>
+                {% endif %}
+                {% endfor %}
+
+                {% if contacts.has_next %} {# whether the next page exists #}
+                <li class="page-item next">
+                  <a class="page-link" href="?page={{ contacts.next_page_number }}">
+                    <i class="mdi mdi-chevron-right"></i>
+                  </a>
+                </li>
+                {% endif %}
       </ul>
     </nav>
+
     <!--/ Basic Pagination -->
   </div>
 </div>
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-      const selectAllCheckbox = document.getElementById('select-all');
-      const contactCheckboxes = document.querySelectorAll('.contact-checkbox');
+    const selectAllCheckbox = document.getElementById('select-all');
+    const contactCheckboxes = document.querySelectorAll('.contact-checkbox');
 
-      selectAllCheckbox.addEventListener('change', function () {
-          const isChecked = this.checked;
-          contactCheckboxes.forEach(function (checkbox) {
-              checkbox.checked = isChecked;
-          });
-      });
-
+    selectAllCheckbox.addEventListener('change', function () {
+      const isChecked = this.checked;
       contactCheckboxes.forEach(function (checkbox) {
-          checkbox.addEventListener('change', function () {
-              const allChecked = [...contactCheckboxes].every(function (checkbox) {
-                  return checkbox.checked;
-              });
-              selectAllCheckbox.checked = allChecked;
-          });
+        checkbox.checked = isChecked;
       });
+    });
+
+    contactCheckboxes.forEach(function (checkbox) {
+      checkbox.addEventListener('change', function () {
+        const allChecked = [...contactCheckboxes].every(function (checkbox) {
+          return checkbox.checked;
+        });
+        selectAllCheckbox.checked = allChecked;
+      });
+    });
   });
 </script>
 <script>
-    // Get today's date
-    var today = new Date().toISOString().split('T')[0];
-    
-    // Set the min attribute of the date input field to today's date
-    document.getElementById("dateInput").setAttribute("min", today);
-  </script>
+  // Get today's date
+  var today = new Date().toISOString().split('T')[0];
+
+  // Set the min attribute of the date input field to today's date
+  document.getElementById("dateInput").setAttribute("min", today);
+</script>
 
 {% endblock %}
