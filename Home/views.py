@@ -296,12 +296,12 @@ def Index(request):
         foreign_key_count_dict[foreign_key_object] = count
         sorted_foreign_key_count_dict = dict(sorted(foreign_key_count_dict.items(), key=lambda item: item[1], reverse=True))
 
-    print(list(foreign_key_count_dict.keys())[0].first_name)
-    print(sorted_foreign_key_count_dict)
+    # print(list(foreign_key_count_dict.keys())[0].first_name)
+    # print(sorted_foreign_key_count_dict)
 
-    rankwisedict = sorted_foreign_key_count_dict
+    # rankwisedict = sorted_foreign_key_count_dict
 
-    print((sorted_foreign_key_count_dict.keys()))
+    # print((sorted_foreign_key_count_dict.keys()))
     
     
 
@@ -314,7 +314,7 @@ def Index(request):
     # ++++++++++++++++++++++++++ Dash Board Chat components data end +++++++++++++++++++++++++++++++++++++
     # 
     # 
-    
+    # "performence_data":rankwisedict,
     
     
     context = {
@@ -338,7 +338,7 @@ def Index(request):
         "donut_list_percentages":donut_list_percentages,
         "ongoing":ongoing,
         "interested_contact_count":interested_contact_count,
-        "performence_data":rankwisedict,
+        
 
 
 

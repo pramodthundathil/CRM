@@ -2,8 +2,8 @@
 {% load static %}
 {% block content %}
 <link rel="stylesheet" href="https://cdn.datatables.net/2.0.6/css/dataTables.dataTables.css" />
-
 <script src="https://cdn.datatables.net/2.0.6/js/dataTables.js"></script>
+
 <style>
   textarea {
     width: 100%;
@@ -12,42 +12,19 @@
     border-radius: 5px;
     outline: none;
   }
-
   .message {
     padding: 10px;
     opacity: .5;
     animation: anim 2s infinite;
-
   }
-
   @keyframes anim {
-    0% {
-      opacity: .5;
-    }
-
-    /* 20%{
-      opacity:  .7;
-    }
-    40%{
-      opacity:  .5;
-    }
-    60%{
-      opacity: .3;
-    }
-    80%{
-      opacity:  .1;
-    } */
-    100% {
-      opacity: 1;
-    }
+    0% { opacity: .5; }
+    100% { opacity: 1; }
   }
-
   .pagenator {
     text-align: center;
   }
 </style>
-
-
 
 <div class="">
   <div class="row flex-grow">
@@ -56,12 +33,11 @@
         <div class="card-body">
           <div class="d-sm-flex justify-content-between align-items-start">
             <div>
-              <h4 class="card-title card-title-dash">assign Contacts <span class="text-small">({{contacts_count}}
-                  Contacts)</span></h4>
+              <h4 class="card-title card-title-dash">Assign Contacts <span class="text-small">({{ contacts_count }} Contacts)</span></h4>
               {% for message in messages %}
-              <div class="message {{message.tags}}">
-                <p class="card-subtitle card-subtitle-dash {{message.tags}}">{{message}}</p>
-                <p class="card-subtitle card-subtitle-dash text-danger">{{form.errors}}</p>
+              <div class="message {{ message.tags }}">
+                <p class="card-subtitle card-subtitle-dash {{ message.tags }}">{{ message }}</p>
+                <p class="card-subtitle card-subtitle-dash text-danger">{{ form.errors }}</p>
               </div>
               {% endfor %}
             </div>
@@ -69,168 +45,98 @@
               {% csrf_token %}
               <div class="row mb-3">
                 <div class="col-md-4">
-                  <label for="">Follow Up Date:</label><br>
+                  <label for="dateInput">Follow Up Date:</label><br>
                   <input type="date" id="dateInput" name="date" class="form-control" required>
                 </div>
                 <div class="col-md-4">
-                  <label for="">Select Staff:</label><br>
-                  <select name="user" id="" class="form-control" required>
+                  <label for="userSelect">Select Staff:</label><br>
+                  <select name="user" id="userSelect" class="form-control" required>
                     <option value="" selected disabled>----------------------------</option>
                     {% for i in users %}
-                    {% if i.groups.all.0.name == "sadmin" or i.groups.all.0.name == "staff" %}
-                    <option value="{{i.id}}">{{i.first_name}}</option>
-
-                    {% endif %}
+                      {% if i.groups.all.0.name == "sadmin" or i.groups.all.0.name == "staff" %}
+                        <option value="{{ i.id }}">{{ i.first_name }}</option>
+                      {% endif %}
                     {% endfor %}
                   </select>
                 </div>
                 <div class="col-md-4">
-                  <button class="btn btn-primary text-white " type="submit" data-bs-toggle="modal"
-                    data-bs-target="#basicModal"><i class="mdi mdi-account-plus"></i> Sigin To Staff</button>
+                  <button class="btn btn-primary text-white" type="submit"><i class="mdi mdi-account-plus"></i> Sign In To Staff</button>
                 </div>
-
-
-
-
               </div>
           </div>
-          <div class="table-responsive  mt-1">
-            <div class="container pagenator" style="display: flex;justify-content: center;">
 
-
-              <div class="demo-inline-spacing">
-                <!-- Basic Pagination -->
-                <nav aria-label="Page navigation">
-                  <ul class="pagination">
-                    {% if contacts.has_previous %} {# whether the previous page exists #}
-                    <li class="page-item prev">
-                      <a class="page-link" href="?page={{ contacts.previous_page_number }}">
-                        <i class="mdi mdi-chevron-left"></i>
-                      </a>
-                    </li>
-                    {% endif %}
-
-                    {# Show first 4 pages #}
-                    {% for page_num in contacts.paginator.page_range %}
-                    {% if page_num <= 4 %} <li class="page-item {% if page_num == contacts.number %}active{% endif %}">
-                      <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
-                      </li>
-                      {% endif %}
-                      {% endfor %}
-
-                      {# Show ellipsis if needed #}
-                      {% if contacts.number > 6 %}
-                      <li class="page-item">
-                        <span class="page-link">...</span>
-                      </li>
-                      {% endif %}
-
-                      {# Show 2 pages before and after current page if they are not in the first 4 or last 4 pages #}
-                      {% for page_num in contacts.paginator.page_range %}
-                      {% if page_num >= contacts.number|add:-2 and page_num <= contacts.number|add:2 and page_num> 4 and
-                        page_num < contacts.paginator.num_pages|add:-3 %} <li
-                          class="page-item {% if page_num == contacts.number %}active{% endif %}">
-                          <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
-                          </li>
-                          {% endif %}
-                          {% endfor %}
-
-                          {# Show ellipsis if needed #}
-                          {% if contacts.number < contacts.paginator.num_pages|add:-5 %} <li class="page-item">
-                            <span class="page-link">...</span>
-                            </li>
-                            {% endif %}
-
-                            {# Show last 4 pages #}
-                            {% for page_num in contacts.paginator.page_range %}
-                            {% if page_num > contacts.paginator.num_pages|add:-4 %}
-                            <li class="page-item {% if page_num == contacts.number %}active{% endif %}">
-                              <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
-                            </li>
-                            {% endif %}
-                            {% endfor %}
-
-                            {% if contacts.has_next %} {# whether the next page exists #}
-                            <li class="page-item next">
-                              <a class="page-link" href="?page={{ contacts.next_page_number }}">
-                                <i class="mdi mdi-chevron-right"></i>
-                              </a>
-                            </li>
-                            {% endif %}
-                  </ul>
-                </nav>
-
-
-                <!--/ Basic Pagination -->
-              </div>
-            </div>
+          <div class="table-responsive mt-1">
             <table class="table select-table">
               <thead>
                 <tr>
                   <th>
                     <div class="form-check form-check-flat mt-0">
                       <label class="form-check-label">
-                        <input id="select-all" type="checkbox" class="form-check-input" aria-checked="false"><i
-                          class="input-helper"></i></label>
+                        <input id="select-all" type="checkbox" class="form-check-input"><i class="input-helper"></i>
+                      </label>
                     </div>
                   </th>
                   <th>Sl No.</th>
                   <th>Customer</th>
-                  <th>Streem</th>
+                  <th>Stream</th>
                   <th>Date added</th>
                   <th>Last Updated</th>
-                  <th>No.Of Follow Up</th>
+                  <th>No. Of Follow Up</th>
                   <th>Status</th>
                   <th>View</th>
                 </tr>
               </thead>
               <tbody>
-                {% for contact in contacts%}
-                <a href="#">
+                {% for contact in contacts %}
                   <tr>
                     <td>
                       <div class="form-check form-check-flat mt-0">
-
                         <label class="form-check-label">
-                          <input type="checkbox" class="form-check-input contact-checkbox" value="{{contact.id}}"
-                            name="contact_id" aria-checked="false"><i class="input-helper"></i></label>
+                          <input type="checkbox" class="form-check-input contact-checkbox" value="{{ contact.id }}" name="contact_id"><i class="input-helper"></i>
+                        </label>
                       </div>
                     </td>
-
-                    <th> {{forloop.counter0|add:contacts.start_index }}</th>
-                    <td>
-                      <div class="d-flex ">
-
-                        <div>
-                          <h6>{{contact.name}}</h6>
-                          <p>{{contact.contact_number}}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <h6>{{contact.study_streem}}</h6>
-                      <p>collage: {{contact.collage}}</p>
-                    </td>
-                    <td>
-                      {{contact.added_date}}
-                    </td>
-                    <td>
-                      {{contact.last_follow_up}}
-                    </td>
-                    <td>
-                      {{contact.number_follow_up}}
-                    </td>
-                    <td>
-                      <div class="badge badge-opacity-warning">{{contact.follow_up_status}}</div>
-                    </td>
-                    <td>
-                      <a href="{%url 'ViewContactData' contact.id %}" class="btn btn-outline-dark btn-sm">View</a>
-                    </td>
+                    <td>{{ forloop.counter0|add:contacts.start_index }}</td>
+                    <td>{{ contact.name }} <br> {{ contact.contact_number }}</td>
+                    <td>{{ contact.study_stream }} <br> College: {{ contact.college }}</td>
+                    <td>{{ contact.added_date }}</td>
+                    <td>{{ contact.last_follow_up }}</td>
+                    <td>{{ contact.number_follow_up }}</td>
+                    <td><div class="badge badge-opacity-warning">{{ contact.follow_up_status }}</div></td>
+                    <td><a href="{% url 'ViewContactData' contact.id %}" class="btn btn-outline-dark btn-sm">View</a></td>
                   </tr>
-                </a>
                 {% endfor %}
               </tbody>
             </table>
+            <nav aria-label="Page navigation">
+              <ul class="pagination">
+                {% if contacts.has_previous %}
+                  <li class="page-item prev">
+                    <a class="page-link" href="?page={{ contacts.previous_page_number }}">
+                      <i class="mdi mdi-chevron-left"></i>
+                    </a>
+                  </li>
+                {% endif %}
+
+                {% for page_num in contacts.paginator.page_range %}
+                  {% if page_num <= 4 or page_num >= contacts.paginator.num_pages|add:-3 or page_num in contacts.number|add:-2|add:2 %}
+                    <li class="page-item {% if page_num == contacts.number %}active{% endif %}">
+                      <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                    </li>
+                  {% elif page_num == 5 or page_num == contacts.number|add:3 %}
+                    <li class="page-item"><span class="page-link">...</span></li>
+                  {% endif %}
+                {% endfor %}
+
+                {% if contacts.has_next %}
+                  <li class="page-item next">
+                    <a class="page-link" href="?page={{ contacts.next_page_number }}">
+                      <i class="mdi mdi-chevron-right"></i>
+                    </a>
+                  </li>
+                {% endif %}
+              </ul>
+            </nav>
           </div>
         </div>
       </div>
@@ -238,75 +144,6 @@
   </div>
 </div>
 </form>
-
-<div class="container pagenator" style="display: flex;justify-content: center;">
-
-
-  <div class="demo-inline-spacing">
-    <!-- Basic Pagination -->
-    <nav aria-label="Page navigation">
-      <ul class="pagination">
-        {% if contacts.has_previous %} {# whether the previous page exists #}
-        <li class="page-item prev">
-          <a class="page-link" href="?page={{ contacts.previous_page_number }}">
-            <i class="mdi mdi-chevron-left"></i>
-          </a>
-        </li>
-        {% endif %}
-
-        {# Show first 4 pages #}
-        {% for page_num in contacts.paginator.page_range %}
-        {% if page_num <= 4 %} <li class="page-item {% if page_num == contacts.number %}active{% endif %}">
-          <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
-          </li>
-          {% endif %}
-          {% endfor %}
-
-          {# Show ellipsis if needed #}
-          {% if contacts.number > 6 %}
-          <li class="page-item">
-            <span class="page-link">...</span>
-          </li>
-          {% endif %}
-
-          {# Show 2 pages before and after current page if they are not in the first 4 or last 4 pages #}
-          {% for page_num in contacts.paginator.page_range %}
-          {% if page_num >= contacts.number|add:-2 and page_num <= contacts.number|add:2 and page_num> 4 and page_num <
-              contacts.paginator.num_pages|add:-3 %} <li
-              class="page-item {% if page_num == contacts.number %}active{% endif %}">
-              <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
-              </li>
-              {% endif %}
-              {% endfor %}
-
-              {# Show ellipsis if needed #}
-              {% if contacts.number < contacts.paginator.num_pages|add:-5 %} <li class="page-item">
-                <span class="page-link">...</span>
-                </li>
-                {% endif %}
-
-                {# Show last 4 pages #}
-                {% for page_num in contacts.paginator.page_range %}
-                {% if page_num > contacts.paginator.num_pages|add:-4 %}
-                <li class="page-item {% if page_num == contacts.number %}active{% endif %}">
-                  <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
-                </li>
-                {% endif %}
-                {% endfor %}
-
-                {% if contacts.has_next %} {# whether the next page exists #}
-                <li class="page-item next">
-                  <a class="page-link" href="?page={{ contacts.next_page_number }}">
-                    <i class="mdi mdi-chevron-right"></i>
-                  </a>
-                </li>
-                {% endif %}
-      </ul>
-    </nav>
-
-    <!--/ Basic Pagination -->
-  </div>
-</div>
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
@@ -328,14 +165,10 @@
         selectAllCheckbox.checked = allChecked;
       });
     });
-  });
-</script>
-<script>
-  // Get today's date
-  var today = new Date().toISOString().split('T')[0];
 
-  // Set the min attribute of the date input field to today's date
-  document.getElementById("dateInput").setAttribute("min", today);
+    var today = new Date().toISOString().split('T')[0];
+    document.getElementById("dateInput").setAttribute("min", today);
+  });
 </script>
 
 {% endblock %}
