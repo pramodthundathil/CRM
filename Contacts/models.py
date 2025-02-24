@@ -1,6 +1,18 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+from django.utils.timezone import make_aware
+from datetime import datetime
+
+class StudentContactQuerySet(models.QuerySet):
+    def active_contacts(self):
+        specific_date = make_aware(datetime(2025, 1, 1))
+        return self.filter(added_date__gte=specific_date)
+
+class StudentContactManager(models.Manager):
+    def get_queryset(self):
+        return StudentContactQuerySet(self.model, using=self._db).active_contacts()
+
 class StudentContact(models.Model):
     name = models.CharField(max_length=200)
     contact_number = models.IntegerField()
@@ -20,6 +32,8 @@ class StudentContact(models.Model):
     lead_status = models.CharField(default="Normal",choices = options1, max_length=255,null=True, blank=True)
     active = models.BooleanField(default=True)
     lead_follow_up = models.ForeignKey(User, on_delete=models.DO_NOTHING, null= True, blank=True)
+        # Apply custom manager
+    objects = StudentContactManager()
 
     def __str__(self):
         return str(self.name)

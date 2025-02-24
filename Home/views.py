@@ -202,7 +202,10 @@ def Index(request):
     total_sum = sum(donut_list)
 
     # Calculate the percentage of each value in donut_list
-    donut_list_percentages = [int((value / total_sum) * 100) for value in donut_list]
+    try:
+        donut_list_percentages = [int((value / total_sum) * 100) for value in donut_list]
+    except:
+        donut_list_percentages = 0
     print(donut_list_percentages,"--------'''''''''''''''''''''''''''''''''''''''''''''''''''---------")
 
 
