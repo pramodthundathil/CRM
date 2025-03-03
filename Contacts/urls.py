@@ -43,6 +43,11 @@ urlpatterns = [
     path("AllCallList",views.AllCallList,name="AllCallList"),
     path("RejectedCallList",views.RejectedCallList,name="RejectedCallList"),
     path("InterestedContacts",views.InterestedContacts,name="InterestedContacts"),
+
+    # new updates 
+    path("slight_interested_contacts_staff", views.slight_interested_contacts_staff,name="slight_interested_contacts_staff"),
+    path("interested_contacts_staff", views.interested_contacts_staff,name="interested_contacts_staff"),
+
     
   
   

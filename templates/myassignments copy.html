@@ -1,6 +1,9 @@
-pytho{% extends 'index.html' %}
+{% extends 'index.html' %}
 {% load static %}
 {% block content %}
+<link rel="stylesheet" href="https://cdn.datatables.net/2.0.6/css/dataTables.dataTables.css" />
+  
+<script src="https://cdn.datatables.net/2.0.6/js/dataTables.js"></script>
 <style>
   textarea {
     width: 100%;
@@ -53,8 +56,8 @@ pytho{% extends 'index.html' %}
         <div class="card-body">
           <div class="d-sm-flex justify-content-between align-items-start">
             <div>
-              <h4 class="card-title card-title-dash">Interested Contacts<span class="text-primary">{{user1.first_name}}</span>  <span class="text-small">({{contacts_count}} Contacts)</span> </h4>
-              <a href="{%url 'Index' %}" class="nav-link"><h4 class="text-info d-flex align-items-center"><i class="mdi mdi-arrow-left-bold-circle-outline icon-md text-info  align-self-center"></i> Back To Dashboard</h4></a>
+              <h4 class="card-title card-title-dash">My Assignments <span class="text-primary">{{user1.first_name}}</span> <span class="text-small">({{contacts_count}} Contacts)</span></h4>
+              <a href="{%url 'Mytasks' %}" class="nav-link"><h4 class="text-info d-flex align-items-center"><i class="mdi mdi-arrow-left-bold-circle-outline icon-md text-info  align-self-center"></i> Back To Leads</h4></a>
               {% for message in messages %}
               <div class="message {{message.tags}}">
                 <p class="card-subtitle card-subtitle-dash {{message.tags}}">{{message}}</p>
@@ -63,13 +66,7 @@ pytho{% extends 'index.html' %}
               {% endfor %}
             </div>
             <div>
-              <!-- <button class="btn btn-primary text-white mb-0 me-0" type="button" data-bs-toggle="modal"
-                data-bs-target="#basicModal"><i class="mdi mdi-account-plus"></i> Add Contact</button>
-              <button class="btn btn-info text-white mb-0 me-0" type="button" data-bs-toggle="modal"
-                data-bs-target="#modalCenter"><i class="mdi mdi mdi-file-excel"></i>
-                Import</button>
-              <button class="btn btn-warning text-white mb-0 me-0" type="button"><i class="mdi mdi mdi-file-excel"></i>
-                Export</button> -->
+             
             </div>
           </div>
           <div class="table-responsive  mt-1">
@@ -143,20 +140,22 @@ pytho{% extends 'index.html' %}
                 <!--/ Basic Pagination -->
               </div>
             </div>
-            <table class="table select-table">
+            <table class="table select-table" >
               <thead>
                 <tr>
                   <th>
                     <div class="form-check form-check-flat mt-0">
                       <label class="form-check-label">
-                        <input type="checkbox" class="form-check-input" aria-checked="false"><i
+                        <input id="select-all" type="checkbox" class="form-check-input" aria-checked="false"><i
                           class="input-helper"></i></label>
                     </div>
                   </th>
+                  <th>Sl No.</th>
                   <th>Customer</th>
                   <th>Streem</th>
-                  <th>Date added</th>
                   <th>Last Updated</th>
+                  <th>Next Follow Up</th>
+
                   <th>No.Of Follow Up</th>
                   <th>Status</th>
                   <th>View</th>
@@ -168,11 +167,14 @@ pytho{% extends 'index.html' %}
                   <tr>
                     <td>
                       <div class="form-check form-check-flat mt-0">
+                        
                         <label class="form-check-label">
-                          <input type="checkbox" class="form-check-input" aria-checked="false"><i
+                          <input type="checkbox" class="form-check-input contact-checkbox" aria-checked="false"><i
                             class="input-helper"></i></label>{{forloop.counter0|add:contacts.start_index }}
                       </div>
                     </td>
+                   
+                    <th> {{forloop.counter}}</th>
                     <td>
                       <div class="d-flex ">
 
@@ -186,12 +188,13 @@ pytho{% extends 'index.html' %}
                       <h6>{{contact.study_streem}}</h6>
                       <p>collage: {{contact.collage}}</p>
                     </td>
-                    <td>
-                      {{contact.added_date}}
-                    </td>
+                    
                     <td>
                       {{contact.last_follow_up}}
                     </td>
+                    <th class="text-danger">
+                      {{contact.next_follow_up}}
+                    </th>
                     <td>
                       {{contact.number_follow_up}}
                     </td>
@@ -284,39 +287,7 @@ pytho{% extends 'index.html' %}
   </div>
 </div>
 <!-- Modal -->
-<div class="modal fade" id="basicModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel1">Add New Contact</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form method="POST">
-          {% csrf_token %}
 
-          <div class="row g-2">
-            {% for field in form %}
-            <div class="col-md-6 mb-0">
-              <label class="form-label">{{field.label}}</label>
-              {{field}}
-            </div>
-            {% endfor %}
-
-          </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-          Close
-        </button>
-        <button type="submit" onclick="return confirm('Confirm To add contact to database ?')"
-          class="btn btn-primary">Save changes</button>
-        </form>
-
-      </div>
-    </div>
-  </div>
-</div>
 
 
 <!-- Modal 2 -->
@@ -350,5 +321,27 @@ pytho{% extends 'index.html' %}
     </div>
   </div>
 </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+      const selectAllCheckbox = document.getElementById('select-all');
+      const contactCheckboxes = document.querySelectorAll('.contact-checkbox');
+
+      selectAllCheckbox.addEventListener('change', function () {
+          const isChecked = this.checked;
+          contactCheckboxes.forEach(function (checkbox) {
+              checkbox.checked = isChecked;
+          });
+      });
+
+      contactCheckboxes.forEach(function (checkbox) {
+          checkbox.addEventListener('change', function () {
+              const allChecked = [...contactCheckboxes].every(function (checkbox) {
+                  return checkbox.checked;
+              });
+              selectAllCheckbox.checked = allChecked;
+          });
+      });
+  });
+</script>
 
 {% endblock %}

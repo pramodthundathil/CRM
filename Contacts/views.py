@@ -343,7 +343,7 @@ def MyAssignments(request):
         page_obj = p.page(p.num_pages)
 
     context = {
-        "contacts":page_obj,
+        "contacts":contacts,
         "users":users,
         "contacts_count":contacts_count
     }  
@@ -966,9 +966,12 @@ def Search(request):
     if request.method == "POST":
         search = request.POST['search']
 
-    contacts = StudentContact.objects.filter(
-            Q(name__icontains=search) | Q(collage__icontains=search)
-        )
+        contacts = StudentContact.objects.filter(
+                                            Q(name__icontains=search) | 
+                                            Q(collage__icontains=search) |  # Moved the closing parenthesis here
+                                            Q(contact_number__icontains=search)  # Added contact search
+                                        )
+
     p = Paginator(contacts, 30)
     page_number = request.GET.get('page')
     try:
@@ -1081,6 +1084,52 @@ def SearchBydateadmin(request):
 
 
 
+
+
+# other functions 
+
+
+def interested_contacts_staff(request):
+
+    contacts = StudentContact.objects.filter(lead_follow_up = request.user,active = True,follow_up_status = "Intrested"  )
+    p = Paginator(contacts, 30)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)  # returns the desired page object
+    except PageNotAnInteger:
+        # if page_number is not an integer then assign the first page
+        page_obj = p.page(1)
+    except EmptyPage:
+        # if page is empty then return last page
+        page_obj = p.page(p.num_pages)
+    context = {
+    "contacts":page_obj,
+    "contacts_count":len(contacts),
+    "user1":request.user
+    }  
+    return render(request,"interestedcontacts_staff.html",context)
+
+
+
+def slight_interested_contacts_staff(request):
+
+    contacts = StudentContact.objects.filter(lead_follow_up = request.user,active = True,follow_up_status = "Intrested"  )
+    p = Paginator(contacts, 30)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = p.get_page(page_number)  # returns the desired page object
+    except PageNotAnInteger:
+        # if page_number is not an integer then assign the first page
+        page_obj = p.page(1)
+    except EmptyPage:
+        # if page is empty then return last page
+        page_obj = p.page(p.num_pages)
+    context = {
+    "contacts":page_obj,
+    "contacts_count":len(contacts),
+    "user1":request.user
+    }  
+    return render(request,"slightly_interestedcontacts_staff.html",context)
 
 
 
