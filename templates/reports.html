@@ -1,0 +1,231 @@
+{% extends 'index.html' %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Lead Reports</h4>
+                    <p class="card-category">Generate and download reports in Excel format</p>
+                </div>
+                <div class="card-body">
+                    <!-- Basic Reports Section -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h5>Basic Reports</h5>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Report Name</th>
+                                            <th>Description</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>All Active Contacts</td>
+                                            <td>Export all active contacts with complete details</td>
+                                            <td>
+                                                <a href="{% url 'export_all_contacts' %}" class="btn btn-sm btn-primary">
+                                                    <i class="fa fa-download"></i> Download Excel
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Follow Up Due</td>
+                                            <td>Export contacts with follow-up due today or overdue</td>
+                                            <td>
+                                                <a href="{% url 'export_follow_up_due' %}" class="btn btn-sm btn-warning">
+                                                    <i class="fa fa-download"></i> Download Excel
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Follow Up Status Reports Section -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h5>Reports by Follow Up Status</h5>
+                            <div class="card">
+                                <div class="card-body">
+                                    <form action="{% url 'export_by_status' %}" method="get" class="form-inline">
+                                        <div class="form-group mr-2">
+                                            <label for="status" class="mr-2">Select Status:</label>
+                                            <select name="status" id="status" class="form-control">
+                                                <option value="Not Called">Not Called</option>
+                                                <option value="RNR">RNR</option>
+                                                <option value="Not Taken">Not Taken</option>
+                                                <option value="Not intrested">Not Interested</option>
+                                                <option value="Line Busy">Line Busy</option>
+                                                <option value="Intrested">Interested</option>
+                                                <option value="Sligtly Intrested">Slightly Interested</option>
+                                                <option value="Call Back">Call Back</option>
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-info">
+                                            <i class="fa fa-download"></i> Download Report
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lead Status Reports Section -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h5>Reports by Lead Status</h5>
+                            <div class="card">
+                                <div class="card-body">
+                                    <form action="{% url 'export_by_lead_status' %}" method="get" class="form-inline">
+                                        <div class="form-group mr-2">
+                                            <label for="lead_status" class="mr-2">Select Lead Status:</label>
+                                            <select name="lead_status" id="lead_status" class="form-control">
+                                                <option value="Warm Lead">Warm Lead</option>
+                                                <option value="Hot Lead">Hot Lead</option>
+                                                <option value="Pending">Pending</option>
+                                                <option value="Converted">Converted</option>
+                                                <option value="Rejected">Rejected</option>
+                                                <option value="Normal">Normal</option>
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="fa fa-download"></i> Download Report
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Staff Reports Section -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h5>Staff Reports</h5>
+                            <div class="card">
+                                <div class="card-body">
+                                    <p>Generate reports for leads assigned to specific staff members or view all staff assignments in a single report.</p>
+                                    <div class="mb-3">
+                                        <a href="{% url 'export_by_staff' %}" class="btn btn-primary">
+                                            <i class="fa fa-download"></i> All Staff Assignments
+                                        </a>
+                                    </div>
+                                    <form action="{% url 'export_by_staff' %}" method="get" class="form-inline">
+                                        <div class="form-group mr-2">
+                                            <label for="staff_id" class="mr-2">Select Staff Member:</label>
+                                            <select name="staff_id" id="staff_id" class="form-control">
+                                                {% for user in users %}
+                                                <option value="{{ user.id }}">{{ user.username }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-info">
+                                            <i class="fa fa-download"></i> Download Report
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Conversion Reports Section -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h5>Conversion Reports</h5>
+                            <div class="card">
+                                <div class="card-body">
+                                    <p>Generate conversion reports for a specific time period.</p>
+                                    <form action="{% url 'export_conversion_report' %}" method="get" class="form-inline">
+                                        <div class="form-group mr-2">
+                                            <label for="days" class="mr-2">Days to include:</label>
+                                            <select name="days" id="days" class="form-control">
+                                                <option value="7">Last 7 days</option>
+                                                <option value="30" selected>Last 30 days</option>
+                                                <option value="90">Last 3 months</option>
+                                                <option value="180">Last 6 months</option>
+                                                <option value="365">Last year</option>
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="fa fa-download"></i> Download Report
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Activity Reports Section -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h5>Staff Activity Reports</h5>
+                            <div class="card">
+                                <div class="card-body">
+                                    <p>Generate reports showing call activity by staff members.</p>
+                                    <form action="{% url 'export_activity_report' %}" method="get" class="form-inline">
+                                        <div class="form-group mr-2">
+                                            <label for="days" class="mr-2">Days to include:</label>
+                                            <select name="days" id="days" class="form-control">
+                                                <option value="1">Today</option>
+                                                <option value="7" selected>Last 7 days</option>
+                                                <option value="30">Last 30 days</option>
+                                                <option value="90">Last 3 months</option>
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fa fa-download"></i> Download Report
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Call History Reports Section -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h5>Contact Call History</h5>
+                            <div class="card">
+                                <div class="card-body">
+                                    <p>Generate detailed call history report for a specific contact.</p>
+                                    <form action="{% url 'export_call_history' %}" method="get" class="row">
+                                        <div class="col-md-8">
+                                            <div class="form-group">
+                                                <label for="contact_id">Enter Contact ID:</label>
+                                                <input type="number" name="contact_id" id="contact_id" class="form-control" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 d-flex align-items-end">
+                                            <button type="submit" class="btn btn-info">
+                                                <i class="fa fa-download"></i> Download Call History
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Add any JavaScript functionality required for the reports page here
+    document.addEventListener('DOMContentLoaded', function() {
+        // Example: Log when a report is downloaded
+        const downloadButtons = document.querySelectorAll('.btn');
+        downloadButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                console.log('Downloading report: ' + this.closest('form')?.action || this.href);
+            });
+        });
+    });
+</script>
+{% endblock content %}
