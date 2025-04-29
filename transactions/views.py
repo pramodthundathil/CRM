@@ -394,3 +394,204 @@ def export_activity_report(request):
         df.to_excel(writer, sheet_name='All Calls', index=False)
     
     return response
+
+
+
+
+# invoice generation 
+
+
+from django.http import JsonResponse
+
+
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from io import BytesIO
+from django.views import View
+from django.utils.decorators import method_decorator
+from Home.models import CompanyProfile
+
+from .models import Invoice, InvoiceItem, Customer
+from .forms import InvoiceForm, InvoiceItemFormSet, CustomerForm
+
+@login_required
+def dashboard(request):
+    invoices = Invoice.objects.all().order_by('-date_created')
+    total_invoices = invoices.count()
+    pending_invoices = invoices.filter(status='SENT').count()
+    paid_invoices = invoices.filter(status='PAID').count()
+    
+    context = {
+        'invoices': invoices[:10],  # Show only 10 latest invoices
+        'total_invoices': total_invoices,
+        'pending_invoices': pending_invoices,
+        'paid_invoices': paid_invoices,
+    }
+    return render(request, 'invoices/dashboard.html', context)
+
+@login_required
+def invoice_list(request):
+    invoices = Invoice.objects.all().order_by('-date_created')
+    return render(request, 'invoices/invoice_list.html', {'invoices': invoices})
+
+@login_required
+def create_invoice(request):
+    if request.method == 'POST':
+        form = InvoiceForm(request.POST)
+        if form.is_valid():
+            invoice = form.save(commit=False)
+            invoice.created_by = request.user
+            invoice.save()
+            
+            formset = InvoiceItemFormSet(request.POST, instance=invoice)
+            if formset.is_valid():
+                formset.save()
+                messages.success(request, 'Invoice created successfully.')
+                return redirect('invoice_detail', pk=invoice.pk)
+    else:
+        form = InvoiceForm()
+        formset = InvoiceItemFormSet()
+    
+    context = {
+        'form': form,
+        'formset': formset,
+        'customers': Customer.objects.all(),
+        
+    }
+    return render(request, 'invoices/invoice_form.html', context)
+
+@login_required
+def edit_invoice(request, pk):
+    invoice = get_object_or_404(Invoice, pk=pk)
+    
+    if request.method == 'POST':
+        form = InvoiceForm(request.POST, instance=invoice)
+        if form.is_valid():
+            form.save()
+            
+            formset = InvoiceItemFormSet(request.POST, instance=invoice)
+            if formset.is_valid():
+                formset.save()
+                messages.success(request, 'Invoice updated successfully.')
+                return redirect('invoice_detail', pk=invoice.pk)
+    else:
+        form = InvoiceForm(instance=invoice)
+        formset = InvoiceItemFormSet(instance=invoice)
+    
+    context = {
+        'form': form,
+        'formset': formset,
+        'invoice': invoice,
+        'customers': Customer.objects.all(),
+        
+    }
+    return render(request, 'invoices/invoice_form.html', context)
+
+@login_required
+def invoice_detail(request, pk):
+    invoice = get_object_or_404(Invoice, pk=pk)
+    return render(request, 'invoices/invoice_detail.html', {'invoice': invoice})
+
+@method_decorator(login_required, name='dispatch')
+class GenerateInvoicePDF(View):
+    def get(self, request, pk):
+        invoice = get_object_or_404(Invoice, pk=pk)
+        company_profile = CompanyProfile.objects.all().last()
+        
+        # Create a context dictionary with all necessary data
+        template = get_template('invoices/invoice_pdf.html')
+        context = {
+            'invoice': invoice,
+            'company': {
+                'name': 'Byte Boot Techno Solutions Pvt Ltd',
+                'address': 'Your Company Address',  # Add your address here
+                'phone': 'Your Company Phone',      # Add your phone here
+                'email': 'Your Company Email',
+                'website': 'Your Company Website',
+            },
+            "company_profile": company_profile
+        }
+        
+        # Convert relative image paths to absolute file system paths
+        html = template.render(context)
+        
+        # Configure PDF options for better handling of images and CSS
+        pdf_options = {
+            "encoding": "UTF-8",
+            "warn": True,  # Show warnings during PDF generation
+            "link_callback": fetch_resources,  # Use a custom resource loader (defined below)
+        }
+        
+        # Create PDF
+        result = BytesIO()
+        pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result, **pdf_options)
+        
+        if not pdf.err:
+            response = HttpResponse(result.getvalue(), content_type='application/pdf')
+            filename = f"Invoice_{invoice.invoice_number}.pdf"
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            return response
+        
+        # If there's an error, print it for debugging
+        print(f"PDF Generation Error: {pdf.err}")
+        return HttpResponse("Error generating PDF", status=400)
+
+# Helper function to resolve resources (especially images)
+def fetch_resources(uri, rel):
+    """
+    Convert HTML URIs to absolute system paths so pisa can access those resources
+    """
+    from django.conf import settings
+    import os.path
+    
+    # Convert URIs starting with MEDIA_URL or STATIC_URL to absolute paths
+    if uri.startswith(settings.MEDIA_URL):
+        path = os.path.join(settings.MEDIA_ROOT, uri.replace(settings.MEDIA_URL, ""))
+    elif uri.startswith(settings.STATIC_URL):
+        path = os.path.join(settings.STATIC_ROOT, uri.replace(settings.STATIC_URL, ""))
+    else:
+        # Handle relative paths referenced in the HTML
+        path = os.path.join(settings.BASE_DIR, uri)
+    
+    # Return the absolute path to the resource
+    return path
+
+@login_required
+def customer_list(request):
+    customers = Customer.objects.all()
+    return render(request, 'invoices/customer_list.html', {'customers': customers})
+
+@login_required
+def create_customer(request):
+    if request.method == 'POST':
+        form = CustomerForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Customer created successfully.')
+            return redirect('customer_list')
+    else:
+        form = CustomerForm()
+    
+    return render(request, 'invoices/customer_form.html', {'form': form})
+
+@login_required
+def edit_customer(request, pk):
+    customer = get_object_or_404(Customer, pk=pk)
+    
+    if request.method == 'POST':
+        form = CustomerForm(request.POST, instance=customer)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Customer updated successfully.')
+            return redirect('customer_list')
+    else:
+        form = CustomerForm(instance=customer)
+    
+    return render(request, 'invoices/customer_form.html', {'form': form, 'customer': customer})
+

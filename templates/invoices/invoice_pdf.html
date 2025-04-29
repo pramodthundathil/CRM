@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice {{ invoice.invoice_number }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20px;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .letterhead-top {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .letterhead-bottom {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .main-content {
+            padding: 0 20px;
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .company-info {
+            width: 50%;
+        }
+
+        .invoice-info {
+            width: 45%;
+            text-align: right;
+        }
+
+        .invoice-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .invoice-number {
+            font-size: 16px;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+
+        .invoice-meta {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .meta-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .meta-label {
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+
+        .address-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .address-block {
+            width: 45%;
+        }
+
+        .address-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 3px;
+        }
+
+        table.table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            table-layout: fixed;
+        }
+
+        .table th {
+            background-color: #3498db;
+            color: white;
+            padding: 8px;
+            text-align: left;
+            font-size: 12px;
+        }
+
+        .table td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            font-size: 12px;
+            word-wrap: break-word;
+        }
+
+        .table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .total-section {
+            display: flex;
+            justify-content: space-evenly;
+            margin-left: auto;
+            
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+        }
+
+        .total-label {
+            font-weight: bold;
+        }
+
+        .grand-total {
+            font-weight: bold;
+            font-size: 16px;
+            color: #2c3e50;
+            border-top: 2px solid #3498db;
+            padding-top: 5px;
+            margin-top: 5px;
+        }
+
+        .notes-section {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .notes-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .footer-text {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 12px;
+            margin: 20px 0;
+        }
+
+        .rupee {
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Top Letterhead - Using absolute path -->
+        <img src="{{ company_profile.letter_head_top.path }}" class="letterhead-top" alt="Company Letterhead">
+
+        <div class="main-content">
+
+            <div class="header-section">
+                <div class="address-section" >
+                    <div class="address-block">
+                        <div class="address-title">Billed To</div>
+                        <div style="font-weight: bold;">{{ invoice.customer.name }}</div>
+                        <div>{{ invoice.customer.address|linebreaksbr }}</div>
+                        <div>Phone: {{ invoice.customer.phone }}</div>
+                        <div>Email: {{ invoice.customer.email }}</div>
+                    </div>
+                </div>
+                <div class="invoice-info">
+                    <div class="invoice-title">INVOICE</div>
+                    <div class="invoice-number">#{{ invoice.invoice_number }}</div>
+                    <div class="invoice-meta">
+                        <div class="meta-row">
+                            <span class="meta-label">Invoice Date:</span>
+                            <span>{{ invoice.date_created|date:"F d, Y" }}</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">Due Date:</span>
+                            <span>{{ invoice.date_due|date:"F d, Y" }}</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">Status:</span>
+                            <span>{{ invoice.get_status_display }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th width="60%">Item Description</th>
+
+                        <th width="20%">Unit Price</th>
+                        <th width="20%" class="text-right">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in invoice.invoiceitem_set.all %}
+                    <tr>
+                        <td>{{ item.product }}</td>
+                        <td><span class="rupee">Rs.</span>{{ item.unit_price }}</td>
+                        <td class="text-right"><span class="rupee">Rs.</span>{{ item.get_total }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="total-section" style="width: 200px !important;position: relative;right: 20px;">
+                <div class="total-row grand-total">
+                    <div class="total-label">TOTAL:</div>
+                    <div><span class="rupee">Rs.</span>{{ invoice.get_total }}</div>
+                </div>
+            </div>
+
+            {% if invoice.notes %}
+            <div class="notes-section">
+                <div class="notes-title">Notes: <small>{{ invoice.notes|linebreaksbr }}</small></div>
+                
+            </div>
+            {% endif %}
+
+            <div class="footer-text">
+                Thank you for your business! All payments are due within the payment terms.
+            </div>
+        </div>
+        <div style="position: fixed;bottom: 0;width: 100%;">
+            <!-- Bottom Letterhead - Using absolute path -->
+            <img src="{{ company_profile.letter_head_bottom.path }}" class="letterhead-bottom" alt="Company Letterhead">
+        </div>
+    </div>
+</body>
+
+</html>

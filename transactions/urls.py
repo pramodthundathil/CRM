@@ -17,4 +17,17 @@ urlpatterns = [
     path('reports/export/conversions/', views.export_conversion_report, name='export_conversion_report'),
     path('reports/export/call-history/', views.export_call_history, name='export_call_history'),
     path('reports/export/activity/', views.export_activity_report, name='export_activity_report'),
+
+
+
+    path('dashboard', views.dashboard, name='dashboard'),
+    path('invoices/', views.invoice_list, name='invoice_list'),
+    path('invoices/create/', views.create_invoice, name='create_invoice'),
+    path('invoices/<int:pk>/', views.invoice_detail, name='invoice_detail'),
+    path('invoices/<int:pk>/edit/', views.edit_invoice, name='edit_invoice'),
+    path('invoices/<int:pk>/pdf/', views.GenerateInvoicePDF.as_view(), name='generate_invoice_pdf'),
+    path('customers/', views.customer_list, name='customer_list'),
+    path('customers/create/', views.create_customer, name='create_customer'),
+    path('customers/<int:pk>/edit/', views.edit_customer, name='edit_customer'),
+
 ]

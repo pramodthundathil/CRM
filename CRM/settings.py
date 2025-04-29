@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Home.apps.HomeConfig',
     "Contacts.apps.ContactsConfig",
+    'transactions'
 ]
 
 AUTHENTICATION_BACKENDS = [

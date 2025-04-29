@@ -10,6 +10,9 @@ class CompanyProfile(models.Model):
     City = models.CharField(max_length=255, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     Company_Logo = models.FileField(upload_to="Company_logo",null=True, blank=True)
+    letter_head_top = models.FileField(upload_to="letter_head_top", null=True, blank=True)
+    letter_head_bottom = models.FileField(upload_to="letter_head_bottom", null=True, blank=True)
+
 
 
 

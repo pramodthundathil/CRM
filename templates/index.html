@@ -404,6 +404,10 @@
               </ul>
             </div>
           </li>
+
+
+
+          
           <li class="nav-item nav-category">Leads And Datas</li>
           {% if request.user.groups.all.0.name == 'sadmin' or request.user.groups.all.0.name == 'admin'%}
           <li class="nav-item">
@@ -487,6 +491,27 @@
               </ul>
             </div>
           </li>
+
+          <li class="nav-item nav-category">Invoicing</li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic_invoice" aria-expanded="false" aria-controls="ui-basic">
+              <i class="menu-icon mdi mdi-floor-plan"></i>
+              <span class="menu-title">Invoice</span>
+              <i class="menu-arrow"></i> 
+            </a>
+            <div class="collapse" id="ui-basic_invoice">
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item"> <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li class="nav-item"> <a class="nav-link" href="{% url 'invoice_list' %}">Invoices</a></li>
+                <li class="nav-item"> <a class="nav-link" href="{% url 'customer_list' %}">Customers</a></li>
+                <li class="nav-item"> <a href="{% url 'create_invoice' %}" class="nav-link">Create Invoice</a></li>
+                <li class="nav-item"> <a href="{% url 'customer_list' %}" class="list-group-item list-group-item-action">Customers</a></li>
+                <a href="{% url 'create_customer' %}" class="list-group-item list-group-item-action">Add Customer</a>
+
+              </ul>
+            </div>
+          </li>
+
           <li class="nav-item nav-category">help</li>
           <li class="nav-item">
             <a class="nav-link" href="#">

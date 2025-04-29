@@ -1,0 +1,109 @@
+{% extends 'index.html' %}
+
+{% block title %}Invoice {{ invoice.invoice_number }} - Invoice System{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Invoice #{{ invoice.invoice_number }}</h1>
+        <div>
+            <a href="{% url 'edit_invoice' invoice.pk %}" class="btn btn-warning">Edit</a>
+            <a href="{% url 'generate_invoice_pdf' invoice.pk %}" class="btn btn-primary">Download PDF</a>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Status Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Status:</strong> 
+                        {% if invoice.status == 'DRAFT' %}
+                            <span class="badge bg-secondary">Draft</span>
+                        {% elif invoice.status == 'SENT' %}
+                            <span class="badge bg-warning">Sent</span>
+                        {% elif invoice.status == 'PAID' %}
+                            <span class="badge bg-success">Paid</span>
+                        {% else %}
+                            <span class="badge bg-danger">Cancelled</span>
+                        {% endif %}
+                    </p>
+                    <p><strong>Created:</strong> {{ invoice.date_created|date:"F d, Y" }}</p>
+                    <p><strong>Due Date:</strong> {{ invoice.date_due|date:"F d, Y" }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Created By:</strong> {{ invoice.created_by.username }}</p>
+                    {% if invoice.notes %}
+                        <p><strong>Notes:</strong> {{ invoice.notes }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">From</h5>
+                </div>
+                <div class="card-body">
+                    <h6>Your Company Name</h6>
+                    <p>Btyteboot Techno Solutions Pvt Ltd <br>
+                    Phone: +91 9778527748<br>
+                    Email: contact@byteboot.in</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">To</h5>
+                </div>
+                <div class="card-body">
+                    <h6>{{ invoice.customer.name }}</h6>
+                    <p>{{ invoice.customer.address|linebreaks }}
+                    Phone: {{ invoice.customer.phone }}<br>
+                    Email: {{ invoice.customer.email }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Invoice Items</h5>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Particulars</th>
+                        <th>Amount</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in invoice.invoiceitem_set.all %}
+                    <tr>
+                        <td>{{ item.product }}</td>
+                        <td>Rs.{{ item.unit_price }}</td>
+                        <td>Rs.{{ item.get_total }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-center">No items found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2" class="text-end"><strong>Grand Total:</strong></td>
+                        <td><strong>Rs.{{ invoice.get_total }}</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+{% endblock %}
